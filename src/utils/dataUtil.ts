@@ -6,7 +6,7 @@ const getDataSync = (fileName: string, namePath: string[] = []) => {
         const data = fs.readFileSync(path.join('./src/data', `/${fileName}`), { encoding: 'utf-8' });
         return namePath.reduce((cur, path: string) => cur[path], JSON.parse(data));
     } catch (err) {
-        console.log('no data');
+        console.log('getDataSync-> no data');
         return null;
     }
 };
@@ -23,7 +23,7 @@ const saveData = async (fileName: string, data: string): Promise<-1 | 0> => {
             });
         });
     } catch (err) {
-        console.log('no data');
+        console.log('saveData-> no data');
         return -1;
     }
 };

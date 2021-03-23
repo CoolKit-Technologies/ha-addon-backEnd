@@ -3,6 +3,9 @@ type TypeHaSocketCallServiceData = {
     service: string;
     service_data: {
         entity_id: string;
+        hs_color?: [number, number];
+        color_temp?: number;
+        brightness_pct?: number;
     };
 };
 type TypeHaSocketStateChangedData = {

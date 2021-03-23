@@ -11,8 +11,8 @@ interface ICloudDeviceConstrucotr<T = any> {
         mac: string;
         apmac: string;
         modelInfo: string;
-        brandId: string;
-        chipid: string;
+        brandId?: string;
+        chipid?: string;
         staMac: string;
     };
     params: T;

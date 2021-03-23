@@ -21,7 +21,6 @@ export default () => {
         },
         onResponseCb(type: 'diy' | 'lan', data: TypeDevice) {
             if (data.txt?.id) {
-                console.log("Jia ~ file: initMdns.ts ~ line 24 ~ onResponseCb ~ data", data);
                 if (type === 'diy') {
                     console.log('found diy device');
                     const device = formatDiyDevice(data as TypeDiyDevice);

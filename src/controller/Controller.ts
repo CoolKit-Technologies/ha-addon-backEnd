@@ -1,5 +1,5 @@
 import ICloudDevice from '../ts/interface/ICloudDevice';
-import { ICloudSwitchParams, ITemperatureAndHumidityModificationParams } from '../ts/interface/ICloudDeviceParams';
+import { ICloudRGBLightParams, ICloudSwitchParams, ITemperatureAndHumidityModificationParams } from '../ts/interface/ICloudDeviceParams';
 import TypeMdnsDiyDevice from '../ts/type/TypeMdnsDiyDevice';
 import CloudDeviceController from './CloudDeviceController';
 import CloudSwitchController from './CloudSwitchController';
@@ -9,6 +9,7 @@ import { getDataSync } from '../utils/dataUtil';
 import TypeLanDevice from '../ts/type/TypeMdnsLanDevice';
 import LanDeviceController from './LanDeviceController';
 import _ from 'lodash';
+import CloudRGBLightController from './CloudRGBLightController';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -68,6 +69,7 @@ class Controller {
         }
         // CLOUD
         if (type === 4) {
+            // 单通道开关
             if (data.extra.uiid === 1) {
                 const tmp = data as ICloudDevice<ICloudSwitchParams>;
                 const switchDevice = new CloudSwitchController({
@@ -81,6 +83,7 @@ class Controller {
                 Controller.deviceMap.set(id, switchDevice);
                 return switchDevice;
             }
+            // 恒温恒湿改装件
             if (data.extra.uiid === 15) {
                 const tmp = data as ICloudDevice<ITemperatureAndHumidityModificationParams>;
                 const thmDevice = new CloudTandHModificationController({
@@ -93,6 +96,20 @@ class Controller {
                 });
                 Controller.deviceMap.set(id, thmDevice);
                 return thmDevice;
+            }
+            // RGB灯球
+            if (data.extra.uiid === 22) {
+                const tmp = data as ICloudDevice<ICloudRGBLightParams>;
+                const rgbLight = new CloudRGBLightController({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, rgbLight);
+                return rgbLight;
             }
         }
     }

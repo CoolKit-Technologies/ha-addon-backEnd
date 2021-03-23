@@ -13,6 +13,7 @@ export default (device: TypeLanDevice) => {
                 data: encryptedData,
             })
         );
+
         console.log(txt.id, '解密成功===========', data);
         return {
             id: txt.id,
@@ -22,7 +23,6 @@ export default (device: TypeLanDevice) => {
             port: srv.port,
         };
     } catch (error) {
-        console.log(txt?.id, '->该设备不在该用户下===========');
         return null;
     }
 };

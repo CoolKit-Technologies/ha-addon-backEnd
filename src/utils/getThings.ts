@@ -5,6 +5,7 @@ import DiyController from '../controller/DiyDeviceController';
 import LanController from '../controller/LanDeviceController';
 import CloudSwitchController from '../controller/CloudSwitchController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
+import CloudRGBLightController from '../controller/CloudRGBLightController';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -32,13 +33,18 @@ export default async () => {
                     type: 4,
                     data: item.itemData,
                 });
-                
+
                 if (device instanceof CloudSwitchController) {
                     device.updateState(params.switch);
                 }
                 if (device instanceof CloudTandHModificationController) {
                     device.updateState(params.switch);
                     device.updateTandH(params.currentTemperature, params.currentHumidity);
+                }
+                if (device instanceof CloudRGBLightController) {
+                    device.updateState({
+                        status: params.state,
+                    });
                 }
             }
         }
