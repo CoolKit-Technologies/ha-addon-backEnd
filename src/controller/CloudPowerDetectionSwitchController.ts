@@ -39,7 +39,7 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
                 deviceid: this.deviceId,
                 params: { uiActive: 120 },
             });
-        }, 12000);
+        }, 120000);
     }
 }
 

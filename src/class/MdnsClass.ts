@@ -91,23 +91,36 @@ export default class Mdns {
                             break;
                     }
                 }
-                if (key && tmp.txt?.type === 'diy_plug') {
-                    console.log('Jia ~ file: MdnsClass.ts ~ line 95 ~ Mdns ~ this.mdns.on ~ tmp.txt', tmp.txt);
+                if (!key) {
+                    return;
+                }
+                if (tmp.txt?.type === 'diy_plug') {
                     const diyDevice = Controller.setDevice({
                         id: key,
                         data: tmp as TypeDiyDevice,
                         type: 1,
                     });
-                    callback && callback('diy', diyDevice);
-                } else {
-                    if (Controller.getDevice(key)?.type !== 4) {
-                        Controller.setDevice({
-                            id: key,
-                            data: tmp as TypeLanDevice,
-                            type: 2,
-                        });
-                        callback && callback('lan', tmp);
-                    }
+                    callback && callback(diyDevice);
+                }
+                if (tmp.txt?.type === 'plug') {
+                    const lanDevice = Controller.setDevice({
+                        id: key,
+                        data: tmp as TypeLanDevice,
+                        type: 2,
+                    });
+                    callback && callback(lanDevice);
+                }
+                if (tmp.txt?.type === 'strip') {
+                    // todo
+                    const lanDevice = Controller.setDevice({
+                        id: key,
+                        data: tmp as TypeLanDevice,
+                        type: 2,
+                    });
+                    callback && callback(lanDevice);
+                }
+                if (tmp.txt?.type === 'enhanced_plug') {
+                    // todo
                 }
             }
         });

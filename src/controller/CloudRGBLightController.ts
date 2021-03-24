@@ -4,6 +4,7 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
 import { parseHS2RGB, parseRGB2HS } from '../utils/colorUitl';
+import _ from 'lodash';
 class CloudRGBLightController extends CloudDeviceController {
     disabled: boolean;
     entityId: string;
@@ -39,7 +40,7 @@ class CloudRGBLightController extends CloudDeviceController {
         hs_color?: [number, number];
         color_temp?: number;
         brightness_pct?: number;
-    }) => { channel0: string; channel1: string; channel2: string; channel3: string; channel4: string; type: string | undefined; state: string };
+    }) => { channel0?: string; channel1?: string; channel2?: string; channel3?: string; channel4?: string; type?: string; state: string };
     parseCkData2Ha!: (params: ICloudRGBLightParams) => { status: string; colorTemp?: number; hsColor?: [number, number]; brightness?: number };
 
     constructor(params: ICloudDeviceConstrucotr<ICloudRGBLightParams>) {
@@ -102,14 +103,14 @@ CloudRGBLightController.prototype.parseHaData2Ck = function ({
     if (color_temp) {
         if (color_temp < 34) {
             type = 'cold';
-            channel0 = 128;
+            channel0 = this.brightness || 128;
         } else if (color_temp > 67) {
             type = 'warm';
-            channel1 = 128;
+            channel1 = this.brightness || 128;
         } else {
             type = 'middle';
-            channel0 = 128;
-            channel1 = 128;
+            channel0 = this.brightness || 128;
+            channel1 = this.brightness || 128;
         }
     }
     if (brightness) {
@@ -117,17 +118,18 @@ CloudRGBLightController.prototype.parseHaData2Ck = function ({
         channel1 = brightness;
     }
     if (state === 'on' && !hs_color && !color_temp && !brightness) {
-        channel0 = 128;
-        channel1 = 128;
+        channel0 = this.brightness;
+        channel1 = this.brightness;
+        [channel2, channel3, channel4] = this.parseHS2RGB(this.hsColor);
     }
     return {
+        type,
+        state,
         channel0: `${channel0}`,
         channel1: `${channel1}`,
         channel2: `${channel2}`,
         channel3: `${channel3}`,
         channel4: `${channel4}`,
-        type,
-        state,
     };
 };
 CloudRGBLightController.prototype.parseCkData2Ha = function (params: ICloudRGBLightParams) {
@@ -186,7 +188,7 @@ CloudRGBLightController.prototype.updateLight = async function (params) {
             this.colorTemp = 50;
             break;
     }
-    if ((res as any).error === 0) {
+    if (res.error === 0) {
         this.updateState({
             status: params.state!,
         });
@@ -210,9 +212,11 @@ CloudRGBLightController.prototype.updateState = async function ({ status, bright
             hs_color: hsColor || this.hsColor,
         },
     });
-    brightness !== undefined && (this.brightness = brightness);
-    colorTemp !== undefined && (this.colorTemp = colorTemp);
-    hsColor && (this.hsColor = hsColor);
+    if (status === 'on') {
+        brightness !== undefined && (this.brightness = brightness);
+        colorTemp !== undefined && (this.colorTemp = colorTemp);
+        hsColor && (this.hsColor = hsColor);
+    }
 };
 
 export default CloudRGBLightController;

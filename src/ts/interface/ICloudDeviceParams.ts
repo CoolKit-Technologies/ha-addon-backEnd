@@ -77,6 +77,20 @@ interface ICloudMultiChannelSwitchParams extends ICloudDeviceParams {
         switch: string;
     }[];
 }
+interface ICloudRGBLightStripParams extends ICloudDeviceParams {
+    sledOnline: string;
+    ssid: string;
+    bssid: string;
+    switch: string;
+    light_type: number; // 1->彩光（色盘） 2->白光（色温）
+    colorR: number; // R值，红色通道范围0-255
+    colorG: number; // G值，绿色通道范围0-255
+    colorB: number; // B值，蓝色通道范围0-255
+    bright: number; // 灯光亮度，范围1-100，值越大越亮
+    mode: number; // 灯带可选的模式，总共12个模式：1 七彩（普通），2 七彩渐变，3 七彩跳变，4 DIY 渐变，5 DIY 流光，6 DIY 跳变，7 DIY 频闪，8 RGB 渐变，9 RGB 流光，10 RGB 跳变，11 RGB 频闪，12 音乐可视化
+    speed: number; // 灯带在不同颜色之间的变化快慢速度，取值范围1-100，值越大速度越快
+    sensitive: number; // 灯带在音乐可视化模式下灯光变化的灵敏度，取值范围1-10，值越大灵敏度越高
+}
 
 export {
     ICloudDeviceParams,
@@ -86,4 +100,5 @@ export {
     ICloudDimmingParams,
     ICloudPowerDetectionSwitchParams,
     ICloudMultiChannelSwitchParams,
+    ICloudRGBLightStripParams,
 };

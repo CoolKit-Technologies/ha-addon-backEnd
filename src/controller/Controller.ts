@@ -4,6 +4,7 @@ import {
     ICloudMultiChannelSwitchParams,
     ICloudPowerDetectionSwitchParams,
     ICloudRGBLightParams,
+    ICloudRGBLightStripParams,
     ICloudSwitchParams,
     ITemperatureAndHumidityModificationParams,
 } from '../ts/interface/ICloudDeviceParams';
@@ -20,14 +21,19 @@ import CloudRGBLightController from './CloudRGBLightController';
 import CloudDimmingController from './CloudDimmingController';
 import CloudPowerDetectionSwitchController from './CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from './CloudMultiChannelSwitch';
+import CloudRGBLightStripController from './CloudRGBLightStripController';
+import formatLanDevice from '../utils/formatLanDevice';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
 
     static getDevice(id: string) {
-        // 删除switch.等前缀
-        const tmp = id.replace(/.*(?=\.)\./, '');
-        return Controller.deviceMap.get(tmp);
+        if (id) {
+            // 删除switch.等前缀
+            const tmp = id.replace(/.*(?=\.)\./, '');
+            return Controller.deviceMap.get(tmp);
+        }
+        return null;
     }
 
     static getDeviceName(id: string) {
@@ -66,12 +72,18 @@ class Controller {
         }
         // LAN
         if (type === 2) {
-            const tmp = data as TypeLanDevice;
+            const params = formatLanDevice(data as TypeLanDevice);
+            if (!params) {
+                return;
+            }
+            const old = Controller.getDevice(id);
+            if (old instanceof LanDeviceController) {
+                old.iv = params?.iv;
+                old.encryptedData = params?.encryptedData;
+                return old;
+            }
             const lanDevice = new LanDeviceController({
-                ip: tmp.a,
-                port: tmp.srv?.port,
-                deviceId: id,
-                txt: tmp.txt,
+                ...params,
                 disabled,
             });
             Controller.deviceMap.set(id, lanDevice);
@@ -79,8 +91,8 @@ class Controller {
         }
         // CLOUD
         if (type === 4) {
-            // 1->单通道插座;6->单通道开关
-            if (data.extra.uiid === 1 || data.extra.uiid === 6) {
+            // 1->单通道插座;6->单通道开关;14->开关改装模块
+            if (data.extra.uiid === 1 || data.extra.uiid === 6 || data.extra.uiid === 14) {
                 const tmp = data as ICloudDevice<ICloudSwitchParams>;
                 const switchDevice = new CloudSwitchController({
                     deviceId: tmp.deviceid,
@@ -92,6 +104,20 @@ class Controller {
                 });
                 Controller.deviceMap.set(id, switchDevice);
                 return switchDevice;
+            }
+            // 4->四通道插座; 7->双通道开关
+            if (data.extra.uiid === 4 || data.extra.uiid === 7) {
+                const tmp = data as ICloudDevice<ICloudMultiChannelSwitchParams>;
+                const device = new CloudMultiChannelSwitch({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, device);
+                return device;
             }
             // 恒温恒湿改装件
             if (data.extra.uiid === 15) {
@@ -149,10 +175,10 @@ class Controller {
                 Controller.deviceMap.set(id, dimming);
                 return dimming;
             }
-            // 双通道开关
-            if (data.extra.uiid === 7) {
-                const tmp = data as ICloudDevice<ICloudMultiChannelSwitchParams>;
-                const device = new CloudMultiChannelSwitch({
+            // RGB灯带
+            if (data.extra.uiid === 59) {
+                const tmp = data as ICloudDevice<ICloudRGBLightStripParams>;
+                const device = new CloudRGBLightStripController({
                     deviceId: tmp.deviceid,
                     deviceName: tmp.name,
                     apikey: tmp.apikey,

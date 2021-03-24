@@ -3,12 +3,13 @@ import { getDataSync } from './dataUtil';
 import Controller from '../controller/Controller';
 import { appId, appSecret } from '../config/app';
 import CloudSwitchController from '../controller/CloudSwitchController';
-import CloudDeviceController from '../controller/CloudDeviceController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
+import { IPowerDetectionSwitchSocketParams, IRGBLightStripSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
 
 const at = getDataSync('user.json', ['at']);
 const apikey = getDataSync('user.json', ['user', 'apikey']);
@@ -38,12 +39,15 @@ export default async () => {
             if (type === 'message' && data !== 'pong') {
                 const tmp = JSON.parse(data);
                 if (tmp.action === 'update') {
-                    const device = Controller.getDevice(tmp.deviceid)!;
+                    if (!tmp.deviceid) {
+                        return;
+                    }
+                    const device = Controller.getDevice(tmp.deviceid);
                     if (device instanceof CloudSwitchController) {
                         device.updateState(tmp.params.switch);
                     }
                     if (device instanceof CloudTandHModificationController) {
-                        const { currentTemperature, currentHumidity, switch: state } = tmp.params;
+                        const { currentTemperature, currentHumidity, switch: state } = tmp.params as ITandHModificationSocketParams;
                         if (currentHumidity && currentTemperature) {
                             device.updateTandH(currentTemperature, currentHumidity);
                         } else if (state) {
@@ -62,7 +66,7 @@ export default async () => {
                         });
                     }
                     if (device instanceof CloudPowerDetectionSwitchController) {
-                        const { current, voltage, power, switch: status } = tmp.params;
+                        const { current, voltage, power, switch: status } = tmp.params as IPowerDetectionSwitchSocketParams;
                         device.updateState({
                             status,
                             current,
@@ -75,6 +79,9 @@ export default async () => {
                         if (Array.isArray(switches)) {
                             device.updateState(switches.slice(0, device.maxChannel));
                         }
+                    }
+                    if (device instanceof CloudRGBLightStripController) {
+                        device.updateState(device.parseCkData2Ha(tmp.params));
                     }
                 }
             }

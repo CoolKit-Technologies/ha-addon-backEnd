@@ -3,24 +3,16 @@ import AuthUtils from './lanControlAuthenticationUtils';
 import { getDataSync } from './dataUtil';
 export default (device: TypeLanDevice) => {
     const { txt, a, srv } = device;
-    try {
-        const apikey = getDataSync('user.json', ['user', 'apikey']) || '';
-        const encryptedData = `${txt.data1 || ''}${txt.data2 || ''}${txt.data3 || ''}${txt.data4 || ''}`;
-        const data = JSON.parse(
-            AuthUtils.decryptionData({
-                iv: txt.iv,
-                key: apikey,
-                data: encryptedData,
-            })
-        );
+    const { data1 = '', data2 = '', data3 = '', data4 = '' } = txt;
 
-        console.log(txt.id, '解密成功===========', data);
+    try {
         return {
-            id: txt.id,
+            deviceId: txt.id,
             type: txt.type,
-            data,
+            encryptedData: `${data1}${data2}${data3}${data4}`,
             ip: a,
             port: srv.port,
+            iv: AuthUtils.decryptionBase64(txt.iv),
         };
     } catch (error) {
         return null;

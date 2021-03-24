@@ -1,6 +1,5 @@
 import CkApi from 'coolkit-open-api';
 import Controller from '../controller/Controller';
-import { updateStates } from '../apis/restApi';
 import DiyController from '../controller/DiyDeviceController';
 import LanController from '../controller/LanDeviceController';
 import CloudSwitchController from '../controller/CloudSwitchController';
@@ -9,6 +8,7 @@ import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -22,13 +22,14 @@ export default async () => {
             if (item.itemType < 3) {
                 const { extra, deviceid, name, params } = item.itemData;
                 const old = Controller.getDevice(deviceid!);
-                // 如果设备已经存在并且是DIY设备就不做任何操作
                 if (old instanceof DiyController) {
+                    // 如果设备已经存在并且是DIY设备就不做任何操作
                     continue;
                 }
-                // 如果设备已经存在并且是Lan设备就添加该设备的apikey
+                // 如果设备已经存在并且是Lan设备就添加该设备的deviceKey
                 if (old instanceof LanController) {
-                    (Controller.getDevice(deviceid!) as LanController).apikey = item.itemData.apikey!;
+                    (Controller.getDevice(deviceid!) as LanController).devicekey = item.itemData.devicekey;
+                    continue;
                 }
                 // 添加为Cloud设备
                 const device = Controller.setDevice({
@@ -45,9 +46,7 @@ export default async () => {
                     device.updateTandH(params.currentTemperature, params.currentHumidity);
                 }
                 if (device instanceof CloudRGBLightController) {
-                    device.updateState({
-                        status: params.state,
-                    });
+                    device.updateState(device.parseCkData2Ha(params));
                 }
                 if (device instanceof CloudDimmingController) {
                     device.updateState({
@@ -66,6 +65,10 @@ export default async () => {
                 }
                 if (device instanceof CloudMultiChannelSwitch) {
                     device.updateState(params.switches.slice(0, device.maxChannel));
+                }
+                if (device instanceof CloudRGBLightStripController) {
+                    const data = device.parseCkData2Ha(params);
+                    device.updateState(data);
                 }
             }
         }

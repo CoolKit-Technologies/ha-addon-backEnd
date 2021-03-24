@@ -33,7 +33,7 @@ CloudDimmingController.prototype.updateLight = async function (params) {
         params,
     });
     // todo
-    if ((res as any).error === 0) {
+    if (res.error === 0) {
         // this.updateState({
         //     status: params.state!,
         // });

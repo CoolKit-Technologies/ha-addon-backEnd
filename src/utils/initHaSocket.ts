@@ -8,6 +8,7 @@ import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 
 export default async () => {
     try {
@@ -35,8 +36,8 @@ export default async () => {
                             });
                             return;
                         }
-                        const { hs_color, color_temp, brightness_pct = 0 } = res.service_data;
-                        const params = device.parseHaData2Ck({ hs_color, color_temp, brightness_pct, state });
+                        const { hs_color, brightness_pct = 0 } = res.service_data;
+                        const params = device.parseHaData2Ck({ hs_color, brightness_pct, state });
                         device.updateLight(params);
                     }
                     if (device instanceof CloudDimmingController) {
@@ -58,6 +59,18 @@ export default async () => {
                             },
                         ];
                         device.updateSwitch(switches);
+                    }
+
+                    if (device instanceof CloudRGBLightStripController) {
+                        if (state === 'off') {
+                            device.updateLight({
+                                switch: state,
+                            });
+                            return;
+                        }
+                        const { hs_color, color_temp, brightness_pct = 0 } = res.service_data;
+                        const params = device.parseHaData2Ck({ hs_color, brightness_pct, state });
+                        device.updateLight(params);
                     }
                 }
             });

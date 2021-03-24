@@ -33,7 +33,7 @@ CloudTandHModificationController.prototype.updateSwitch = async function (status
             switch: status,
         },
     });
-    if ((res as any).error === 0) {
+    if (res.error === 0) {
         this.updateState(status);
     }
 };

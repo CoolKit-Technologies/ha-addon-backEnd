@@ -43,13 +43,13 @@ DiyController.prototype.setSwitch = async function (status) {
         });
 };
 DiyController.prototype.updateState = async function (status) {
-    updateStates(this.deviceId, {
-        entity_id: `switch.${this.deviceId}`,
+    updateStates(this.entityId, {
+        entity_id: this.entityId,
         state: status,
         attributes: {
             restored: true,
             supported_features: 0,
-            friendly_name: this.deviceId,
+            friendly_name: this.entityId,
             state: status,
         },
     }).catch((e) => {

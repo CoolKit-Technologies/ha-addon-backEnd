@@ -1,11 +1,11 @@
 import LanControlAuthenticationUtils from '../utils/lanControlAuthenticationUtils';
 function test() {
-    let iv = 'NDExODI1MDIzNTA5NzYzNw';
+    let iv = 'OTU0MTc4NTg3MjQzMjU4Mw';
     iv = LanControlAuthenticationUtils.decryptionBase64(iv);
 
-    const key = '232a7913-9182-4c2c-ba5d-3cc394cdc57c';
+    const key = '8a031b29-8ee1-4bd4-b5ce-143738445bfd';
     const data =
-        'XYkJvP6mF+U/nO55RFhlKfJlsSYzYbuFFSqEITqvDgah9LiZgm4qViUesgVE8SSAtch/5r4UWtEI8X4lQxoDELB47c98j8Blt/bsnFUA9UWRh6+04qCBzKS1CAjhoGPdpUCzlM2zd4P3t837QVf/9PeSwob7UHt1dzKqbAITzkMZrMqxuWfzVtWX10tvG8N5oLdHx4KdvLOAI04ys37887vDqyJAnyRTOx+N7z2KIyruTYdwneez/72SY+CYMLvy0ogpPFNU+74sB9ahbA6FtagTh7wLqF4uDnaB1UOjzFZvTay6KeT8y8tsywVHLHRZ';
+        'p1wW+Dj1ZvRR8VAEXje6z4Ba18gSyzt3bid6TyHGaMuvmhB9s5Zb+qV82PFnA5g/f1lg+2IXxiDORnwA9/XujxdMFlIJ785occlOe6ZV/COIRjBAtTQ/4aaeu3C3DBIJlPGEyV305/b/LuqLLW+OQdbUodnV4AGdjy5ArT8Mc18nSuUdSphdyPDFVFDHDhFwRcYbU+VkaDr8qSLIjKrEFegGxjfyPDciSwmHJDrfgH7lMuJK4qNHviSOijm3lZWf2kjE35ospFqH4oMCSrF1H4g6SuT03PEIMCfXtTDa2xjgY9qYlTdmJl3Ou3y4pPu/jupi8kzKUSkTyy/Tw1GOvjKY8Q5A9EAa4fnSlZQhs/Fww88JCPvtew9GxobZsmFhrFHqWPNtzv19Vh4FziIQoqNTVy+SDm8jzyRP/E2307jVe/9VZzLotLgshkhn4ctenoP51/rk5UQbM7p+XCyhFuwQMF1RIPuizK8tpnpoPMVQDH6ZqSMJMK8POUb+y9yRXkRei52XEfJpMsJy8q4yd1QvmPkJvXtK53xIQjQNF+TMQNZ5hOKDDu++aiP8QXaR7DQQwBhW99n+eH7Pc4UgFw';
 
     console.log('iv ', iv);
     console.log('key ', key);

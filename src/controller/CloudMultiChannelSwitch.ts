@@ -25,6 +25,9 @@ class CloudMultiChannelSwitch extends CloudDeviceController {
         this.extra = params.extra;
         this.disabled = params.disabled!;
         this.uiid = params.extra.uiid;
+        if (params.extra.uiid === 4) {
+            this.maxChannel = 4;
+        }
         if (params.extra.uiid === 7) {
             this.maxChannel = 2;
         }
