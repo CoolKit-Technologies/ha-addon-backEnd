@@ -16,10 +16,10 @@ CkApi.init({
     appSecret,
 });
 
+initMdns();
 initCkWs();
 initCkApi();
 initHaSocket();
-initMdns();
 
 const app = express();
 const port = 3000;

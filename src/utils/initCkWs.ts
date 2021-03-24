@@ -6,6 +6,9 @@ import CloudSwitchController from '../controller/CloudSwitchController';
 import CloudDeviceController from '../controller/CloudDeviceController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
+import CloudDimmingController from '../controller/CloudDimmingController';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
 
 const at = getDataSync('user.json', ['at']);
 const apikey = getDataSync('user.json', ['user', 'apikey']);
@@ -31,8 +34,6 @@ export default async () => {
 
     await coolKitWs.on('message', (ws) => {
         try {
-            console.log('接收到消息：', ws.data);
-
             const { type, data } = ws;
             if (type === 'message' && data !== 'pong') {
                 const tmp = JSON.parse(data);
@@ -50,32 +51,30 @@ export default async () => {
                         }
                     }
                     if (device instanceof CloudRGBLightController) {
-                        const { channel0, channel1, channel2, channel3, channel4, zyx_mode, type, state } = tmp.params;
-                        let hs, temp, brightness;
-                        if (channel2 && channel3 && channel4) {
-                            hs = device.parseRGB2HS(+channel2, +channel3, +channel4);
-                            brightness = 128;
-                        }
-                        if (channel0 || channel1) {
-                            brightness = Math.max(+channel1, +channel0);
-                        }
-                        switch (type) {
-                            case 'cold':
-                                temp = 0;
-                                break;
-                            case 'middle':
-                                temp = 50;
-                                break;
-                            case 'warm':
-                                temp = 100;
-                                break;
-                        }
+                        const params = device.parseCkData2Ha(tmp.params);
+                        device.updateState(params);
+                    }
+                    if (device instanceof CloudDimmingController) {
+                        const { bright, switch: status } = tmp.params;
                         device.updateState({
-                            status: state || 'on',
-                            colorTemp: temp,
-                            hsColor: hs,
-                            brightness,
+                            status,
+                            bright,
                         });
+                    }
+                    if (device instanceof CloudPowerDetectionSwitchController) {
+                        const { current, voltage, power, switch: status } = tmp.params;
+                        device.updateState({
+                            status,
+                            current,
+                            voltage,
+                            power,
+                        });
+                    }
+                    if (device instanceof CloudMultiChannelSwitch) {
+                        const { switches } = tmp.params;
+                        if (Array.isArray(switches)) {
+                            device.updateState(switches.slice(0, device.maxChannel));
+                        }
                     }
                 }
             }

@@ -16,6 +16,18 @@ interface ICloudSwitchParams extends ICloudDeviceParams {
     pulse: string;
     pulseWidth: number;
 }
+interface ICloudPowerDetectionSwitchParams extends ICloudSwitchParams {
+    alarmType: string;
+    alarmVValue: [number, number];
+    alarmCValue: [number, number];
+    alarmPValue: [number, number];
+    power: string;
+    voltage: string;
+    current: string;
+    oneKwh: string;
+    uiActive: number;
+    hundredDaysKwh: string;
+}
 
 interface ITemperatureAndHumidityModificationParams extends ICloudDeviceParams {
     sledOnline: string;
@@ -33,7 +45,7 @@ interface ITemperatureAndHumidityModificationParams extends ICloudDeviceParams {
     currentTemperature: string;
 }
 
-interface ICloudRGBLightParams {
+interface ICloudRGBLightParams extends ICloudDeviceParams {
     channel0: string;
     channel1: string;
     channel2: string;
@@ -44,4 +56,34 @@ interface ICloudRGBLightParams {
     zyx_mode: number;
 }
 
-export { ICloudDeviceParams, ICloudSwitchParams, ITemperatureAndHumidityModificationParams, ICloudRGBLightParams };
+interface ICloudDimmingParams extends ICloudDeviceParams {
+    switch: string;
+    bright: number;
+}
+
+interface ICloudMultiChannelSwitchParams extends ICloudDeviceParams {
+    lock: number;
+    configure: {
+        startup: string;
+        outlet: number;
+    }[];
+    pulses: {
+        pulse: string;
+        width: number;
+        outlet: number;
+    }[];
+    switches: {
+        outlet: number;
+        switch: string;
+    }[];
+}
+
+export {
+    ICloudDeviceParams,
+    ICloudSwitchParams,
+    ITemperatureAndHumidityModificationParams,
+    ICloudRGBLightParams,
+    ICloudDimmingParams,
+    ICloudPowerDetectionSwitchParams,
+    ICloudMultiChannelSwitchParams,
+};

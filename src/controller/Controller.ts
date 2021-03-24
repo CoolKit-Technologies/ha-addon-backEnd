@@ -1,5 +1,12 @@
 import ICloudDevice from '../ts/interface/ICloudDevice';
-import { ICloudRGBLightParams, ICloudSwitchParams, ITemperatureAndHumidityModificationParams } from '../ts/interface/ICloudDeviceParams';
+import {
+    ICloudDimmingParams,
+    ICloudMultiChannelSwitchParams,
+    ICloudPowerDetectionSwitchParams,
+    ICloudRGBLightParams,
+    ICloudSwitchParams,
+    ITemperatureAndHumidityModificationParams,
+} from '../ts/interface/ICloudDeviceParams';
 import TypeMdnsDiyDevice from '../ts/type/TypeMdnsDiyDevice';
 import CloudDeviceController from './CloudDeviceController';
 import CloudSwitchController from './CloudSwitchController';
@@ -10,6 +17,9 @@ import TypeLanDevice from '../ts/type/TypeMdnsLanDevice';
 import LanDeviceController from './LanDeviceController';
 import _ from 'lodash';
 import CloudRGBLightController from './CloudRGBLightController';
+import CloudDimmingController from './CloudDimmingController';
+import CloudPowerDetectionSwitchController from './CloudPowerDetectionSwitchController';
+import CloudMultiChannelSwitch from './CloudMultiChannelSwitch';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -69,8 +79,8 @@ class Controller {
         }
         // CLOUD
         if (type === 4) {
-            // 单通道开关
-            if (data.extra.uiid === 1) {
+            // 1->单通道插座;6->单通道开关
+            if (data.extra.uiid === 1 || data.extra.uiid === 6) {
                 const tmp = data as ICloudDevice<ICloudSwitchParams>;
                 const switchDevice = new CloudSwitchController({
                     deviceId: tmp.deviceid,
@@ -110,6 +120,48 @@ class Controller {
                 });
                 Controller.deviceMap.set(id, rgbLight);
                 return rgbLight;
+            }
+            // 功率检测告警开关
+            if (data.extra.uiid === 32) {
+                const tmp = data as ICloudDevice<ICloudPowerDetectionSwitchParams>;
+                const switchDevice = new CloudPowerDetectionSwitchController({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, switchDevice);
+                return switchDevice;
+            }
+            // 调光开关
+            if (data.extra.uiid === 36) {
+                const tmp = data as ICloudDevice<ICloudDimmingParams>;
+                const dimming = new CloudDimmingController({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, dimming);
+                return dimming;
+            }
+            // 双通道开关
+            if (data.extra.uiid === 7) {
+                const tmp = data as ICloudDevice<ICloudMultiChannelSwitchParams>;
+                const device = new CloudMultiChannelSwitch({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, device);
+                return device;
             }
         }
     }

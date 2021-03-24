@@ -5,6 +5,9 @@ import DiyDeviceController from '../controller/DiyDeviceController';
 import CloudSwitchController from '../controller/CloudSwitchController';
 import { TypeHaSocketStateChangedData, TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
+import CloudDimmingController from '../controller/CloudDimmingController';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
 
 export default async () => {
     try {
@@ -18,7 +21,7 @@ export default async () => {
                 } = res;
                 const state = service === 'turn_off' ? 'off' : 'on';
                 if (entity_id) {
-                    const device = Controller.getDevice(entity_id);
+                    const device = Controller.getDevice(entity_id.replace(/_\d+$/, ''));
                     if (device instanceof DiyDeviceController) {
                         device.setSwitch(state);
                     }
@@ -33,46 +36,28 @@ export default async () => {
                             return;
                         }
                         const { hs_color, color_temp, brightness_pct = 0 } = res.service_data;
-                        const brightness = brightness_pct * 2.55;
-                        let channel0 = 0,
-                            channel1 = 0,
-                            channel2 = 0,
-                            channel3 = 0,
-                            channel4 = 0,
-                            type;
-                        if (hs_color) {
-                            [channel2, channel3, channel4] = device.parseHS2RGB(hs_color);
-                        }
-                        if (color_temp) {
-                            if (color_temp < 34) {
-                                type = 'cold';
-                                channel0 = 128;
-                            } else if (color_temp > 67) {
-                                type = 'warm';
-                                channel1 = 128;
-                            } else {
-                                type = 'middle';
-                                channel0 = 128;
-                                channel1 = 128;
-                            }
-                        }
-                        if (brightness) {
-                            channel0 = brightness;
-                            channel1 = brightness;
-                        }
-                        if (state === 'on' && !hs_color && !color_temp && !brightness) {
-                            channel0 = 128;
-                            channel1 = 128;
-                        }
+                        const params = device.parseHaData2Ck({ hs_color, color_temp, brightness_pct, state });
+                        device.updateLight(params);
+                    }
+                    if (device instanceof CloudDimmingController) {
+                        const { brightness_pct } = res.service_data;
                         device.updateLight({
-                            channel0: `${channel0}`,
-                            channel1: `${channel1}`,
-                            channel2: `${channel2}`,
-                            channel3: `${channel3}`,
-                            channel4: `${channel4}`,
-                            state,
-                            type,
+                            switch: state,
+                            bright: brightness_pct,
                         });
+                    }
+                    if (device instanceof CloudPowerDetectionSwitchController) {
+                        device.updateSwitch(state);
+                    }
+                    if (device instanceof CloudMultiChannelSwitch) {
+                        const [id, outlet] = entity_id.split('_');
+                        const switches = [
+                            {
+                                outlet: +outlet - 1,
+                                switch: state,
+                            },
+                        ];
+                        device.updateSwitch(switches);
                     }
                 }
             });

@@ -6,6 +6,9 @@ import LanController from '../controller/LanDeviceController';
 import CloudSwitchController from '../controller/CloudSwitchController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
+import CloudDimmingController from '../controller/CloudDimmingController';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -45,6 +48,24 @@ export default async () => {
                     device.updateState({
                         status: params.state,
                     });
+                }
+                if (device instanceof CloudDimmingController) {
+                    device.updateState({
+                        status: params.switch,
+                        bright: params.bright,
+                    });
+                }
+                if (device instanceof CloudPowerDetectionSwitchController) {
+                    const { switch: status, power, voltage, current } = params;
+                    device.updateState({
+                        status,
+                        power,
+                        voltage,
+                        current,
+                    });
+                }
+                if (device instanceof CloudMultiChannelSwitch) {
+                    device.updateState(params.switches.slice(0, device.maxChannel));
                 }
             }
         }
