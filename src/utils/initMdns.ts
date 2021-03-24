@@ -4,6 +4,8 @@ import TypeDevice from '../ts/type/TypeMdnsDevice';
 import TypeDiyDevice from '../ts/type/TypeMdnsDiyDevice';
 import DiyController from '../controller/DiyDeviceController';
 import LanDeviceController from '../controller/LanDeviceController';
+import LanSwitchController from '../controller/LanSwitchController';
+import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 
 export default () => {
     return Mdns.createInstance({
@@ -24,10 +26,13 @@ export default () => {
                 const diyDevice = formatDiyDevice(device as TypeDiyDevice);
                 device.updateState(diyDevice.data?.switch!);
             }
-            if (device instanceof LanDeviceController) {
+            if (device instanceof LanSwitchController) {
                 // todo
-                // console.log('found lan device');
-                console.log('==================', device.parseEncryptedData());
+                console.log('found lan switch');
+            }
+            if (device instanceof LanMultiChannelSwitchController) {
+                // todo
+                console.log('found lan multiChannelSwitch');
             }
         },
     });

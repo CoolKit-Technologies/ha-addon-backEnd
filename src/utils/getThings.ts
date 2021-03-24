@@ -9,6 +9,7 @@ import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
+import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -20,7 +21,7 @@ export default async () => {
         for (let i = 0; i < thingList.length; i++) {
             const item = thingList[i];
             if (item.itemType < 3) {
-                const { extra, deviceid, name, params } = item.itemData;
+                const { extra, deviceid, name, params, devicekey, apikey } = item.itemData;
                 const old = Controller.getDevice(deviceid!);
                 if (old instanceof DiyController) {
                     // 如果设备已经存在并且是DIY设备就不做任何操作
@@ -28,9 +29,28 @@ export default async () => {
                 }
                 // 如果设备已经存在并且是Lan设备就添加该设备的deviceKey
                 if (old instanceof LanController) {
-                    (Controller.getDevice(deviceid!) as LanController).devicekey = item.itemData.devicekey;
+                    old.devicekey = devicekey;
+                    old.selfApikey = apikey;
+                    old.deviceName = name;
+                    if (old instanceof LanMultiChannelSwitchController) {
+                        switch (extra.uiid) {
+                            case 4:
+                                old.maxChannel = 4;
+                                break;
+                            case 7:
+                                old.maxChannel = 2;
+                                break;
+                            default:
+                                break;
+                        }
+                        const decryptData = old.parseEncryptedData() as any;
+                        if (decryptData) {
+                            old.updateState(decryptData.switches);
+                        }
+                    }
                     continue;
                 }
+
                 // 添加为Cloud设备
                 const device = Controller.setDevice({
                     id: deviceid!,

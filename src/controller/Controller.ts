@@ -23,6 +23,8 @@ import CloudPowerDetectionSwitchController from './CloudPowerDetectionSwitchCont
 import CloudMultiChannelSwitch from './CloudMultiChannelSwitch';
 import CloudRGBLightStripController from './CloudRGBLightStripController';
 import formatLanDevice from '../utils/formatLanDevice';
+import LanSwitchController from './LanSwitchController';
+import LanMultiChannelSwitchController from './LanMultiChannelSwitchController';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -51,8 +53,8 @@ class Controller {
      * @param {data} 设备数据
      * @memberof Controller
      */
-    static setDevice(params: { id: string; type: number; data: any }) {
-        const { id, type, data } = params;
+    static setDevice(params: { id: string; type: number; data: any; lanType?: string }) {
+        const { id, type, data, lanType } = params;
         if (_.isEmpty(id)) {
             return null;
         }
@@ -82,12 +84,24 @@ class Controller {
                 old.encryptedData = params?.encryptedData;
                 return old;
             }
-            const lanDevice = new LanDeviceController({
-                ...params,
-                disabled,
-            });
-            Controller.deviceMap.set(id, lanDevice);
-            return lanDevice;
+
+            if (lanType === 'plug') {
+                const lanDevice = new LanSwitchController({
+                    ...params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, lanDevice);
+                return lanDevice;
+            }
+
+            if (lanType === 'strip') {
+                const lanDevice = new LanMultiChannelSwitchController({
+                    ...params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, lanDevice);
+                return lanDevice;
+            }
         }
         // CLOUD
         if (type === 4) {

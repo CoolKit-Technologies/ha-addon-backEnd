@@ -10,16 +10,20 @@ import initCkWs from './utils/initCkWs';
 import initHaSocket from './utils/initHaSocket';
 import initCkApi from './utils/initCkApi';
 import { appId, appSecret } from './config/app';
+import sleep from './utils/sleep';
 
 CkApi.init({
     appId,
     appSecret,
 });
 
-initMdns();
-initCkWs();
-initCkApi();
-initHaSocket();
+(async () => {
+    initMdns();
+    initHaSocket();
+    initCkWs();
+    await sleep(3000);
+    initCkApi();
+})();
 
 const app = express();
 const port = 3000;

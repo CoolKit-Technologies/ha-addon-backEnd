@@ -11,8 +11,13 @@ type TypeConstrucotr = {
     encryptedData?: string;
     iv: string;
 };
+type TypeSwitch = {
+    outlet: number;
+    switch: string;
+};
+type TypeSwitches = TypeSwitch[];
 
-class LanSwitchController extends LanDeviceController {
+class LanMultiChannelSwitchController extends LanDeviceController {
     deviceId: string;
     entityId: string;
     ip: string;
@@ -23,8 +28,9 @@ class LanSwitchController extends LanDeviceController {
     devicekey?: string;
     selfApikey?: string;
     deviceName?: string;
-    setSwitch!: (status: string) => Promise<void>;
-    updateState!: (status: string) => Promise<any>;
+    maxChannel?: number;
+    setSwitch!: (switches: [TypeSwitch]) => Promise<void>;
+    updateState!: (switches: TypeSwitches) => Promise<any>;
     constructor({ deviceId, ip, port = 8081, disabled, encryptedData, iv }: TypeConstrucotr) {
         super();
         this.deviceId = deviceId;
@@ -37,7 +43,7 @@ class LanSwitchController extends LanDeviceController {
     }
 }
 
-LanSwitchController.prototype.setSwitch = async function (status) {
+LanMultiChannelSwitchController.prototype.setSwitch = async function (switches) {
     // let apikey = getDataSync('user.json', ['user', 'apikey']);
     if (this.devicekey && this.selfApikey) {
         const { data } = await setSwitch({
@@ -47,27 +53,28 @@ LanSwitchController.prototype.setSwitch = async function (status) {
             devicekey: this.devicekey,
             selfApikey: this.selfApikey,
             data: JSON.stringify({
-                switch: status,
+                switches,
             }),
         });
         if (data && data.error === 0) {
-            this.updateState(status);
+            this.updateState(switches);
         }
     }
 };
 
-LanSwitchController.prototype.updateState = async function (status) {
-    const res = await updateStates(this.entityId, {
-        entity_id: this.entityId,
-        state: status,
-        attributes: {
-            restored: true,
-            supported_features: 0,
-            friendly_name: this.deviceName || this.entityId,
+LanMultiChannelSwitchController.prototype.updateState = async function (switches) {
+    switches.forEach(({ outlet, switch: status }) => {
+        updateStates(`${this.entityId}_${outlet + 1}`, {
+            entity_id: `${this.entityId}_${outlet + 1}`,
             state: status,
-        },
+            attributes: {
+                restored: true,
+                supported_features: 0,
+                friendly_name: `${this.deviceName}-${outlet + 1}`,
+                state: status,
+            },
+        });
     });
-    console.log(res);
 };
 
-export default LanSwitchController;
+export default LanMultiChannelSwitchController;

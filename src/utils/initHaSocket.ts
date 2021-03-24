@@ -2,13 +2,16 @@ import _ from 'lodash';
 import HASocket from '../class/HASocketClass';
 import Controller from '../controller/Controller';
 import DiyDeviceController from '../controller/DiyDeviceController';
+import LanSwitchController from '../controller/LanSwitchController';
 import CloudSwitchController from '../controller/CloudSwitchController';
-import { TypeHaSocketStateChangedData, TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
+import { TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
+import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 
 export default async () => {
     try {
@@ -23,9 +26,34 @@ export default async () => {
                 const state = service === 'turn_off' ? 'off' : 'on';
                 if (entity_id) {
                     const device = Controller.getDevice(entity_id.replace(/_\d+$/, ''));
+                    // DIY
                     if (device instanceof DiyDeviceController) {
                         device.setSwitch(state);
                     }
+
+                    // LAN
+                    if (device instanceof LanSwitchController) {
+                        device.setSwitch(state);
+                    }
+
+                    // LAN
+                    if (device instanceof LanMultiChannelSwitchController) {
+                        const [id, outlet] = entity_id.split('_');
+                        const switches = [
+                            {
+                                outlet: +outlet - 1,
+                                switch: state,
+                            },
+                        ] as [
+                            {
+                                outlet: number;
+                                switch: string;
+                            }
+                        ];
+                        device.setSwitch(switches);
+                    }
+
+                    // Cloud
                     if (device instanceof CloudSwitchController) {
                         device.updateSwitch(state);
                     }
@@ -50,6 +78,11 @@ export default async () => {
                     if (device instanceof CloudPowerDetectionSwitchController) {
                         device.updateSwitch(state);
                     }
+
+                    if (device instanceof CloudTandHModificationController) {
+                        device.updateSwitch(state);
+                    }
+                    
                     if (device instanceof CloudMultiChannelSwitch) {
                         const [id, outlet] = entity_id.split('_');
                         const switches = [

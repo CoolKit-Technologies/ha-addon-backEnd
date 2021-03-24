@@ -102,26 +102,29 @@ export default class Mdns {
                     });
                     callback && callback(diyDevice);
                 }
-                if (tmp.txt?.type === 'plug') {
-                    const lanDevice = Controller.setDevice({
-                        id: key,
-                        data: tmp as TypeLanDevice,
-                        type: 2,
-                    });
-                    callback && callback(lanDevice);
-                }
-                if (tmp.txt?.type === 'strip') {
-                    // todo
-                    const lanDevice = Controller.setDevice({
-                        id: key,
-                        data: tmp as TypeLanDevice,
-                        type: 2,
-                    });
-                    callback && callback(lanDevice);
-                }
-                if (tmp.txt?.type === 'enhanced_plug') {
-                    // todo
-                }
+                // 先不用LAN
+                // if (tmp.txt?.type === 'plug') {
+                //     const lanDevice = Controller.setDevice({
+                //         id: key,
+                //         data: tmp as TypeLanDevice,
+                //         type: 2,
+                //         lanType: 'plug',
+                //     });
+                //     callback && callback(lanDevice);
+                // }
+                // if (tmp.txt?.type === 'strip') {
+                //     // todo
+                //     const lanDevice = Controller.setDevice({
+                //         id: key,
+                //         data: tmp as TypeLanDevice,
+                //         type: 2,
+                //         lanType: 'strip',
+                //     });
+                //     callback && callback(lanDevice);
+                // }
+                // if (tmp.txt?.type === 'enhanced_plug') {
+                //     // todo
+                // }
             }
         });
     }
