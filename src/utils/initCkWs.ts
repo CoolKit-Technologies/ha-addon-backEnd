@@ -7,9 +7,10 @@ import CloudTandHModificationController from '../controller/CloudTandHModificati
 import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
-import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
-import { IPowerDetectionSwitchSocketParams, IRGBLightStripSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
+import { IPowerDetectionSwitchSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
+import { getStateByEntityId, updateStates } from '../apis/restApi';
 
 const at = getDataSync('user.json', ['at']);
 const apikey = getDataSync('user.json', ['user', 'apikey']);
@@ -24,25 +25,17 @@ export default async () => {
         at,
         apikey,
     });
-    console.log('Jia ~ file: initCkWs.ts ~ line 21 ~ apikey user============', apikey);
 
-    // await coolKitWs.init({
-    //     appid: 'KOBxGJna5qkk3JLXw3LHLX3wSNiPjAVi',
-    //     secret: '4v0sv6X5IM2ASIBiNDj6kGmSfxo40w7n',
-    //     at: '975e779a41b27031cc41307a0bf3292f6113e08b',
-    //     apikey: 'efe86fc8-bf2f-40ec-8286-49f4012cef52',
-    // });
-
-    await coolKitWs.on('message', (ws) => {
+    coolKitWs.on('message', async (ws) => {
         try {
             const { type, data } = ws;
             if (type === 'message' && data !== 'pong') {
                 const tmp = JSON.parse(data);
+                if (!tmp.deviceid) {
+                    return;
+                }
+                const device = Controller.getDevice(tmp.deviceid);
                 if (tmp.action === 'update') {
-                    if (!tmp.deviceid) {
-                        return;
-                    }
-                    const device = Controller.getDevice(tmp.deviceid);
                     if (device instanceof CloudSwitchController) {
                         device.updateState(tmp.params.switch);
                     }
@@ -74,7 +67,7 @@ export default async () => {
                             power,
                         });
                     }
-                    if (device instanceof CloudMultiChannelSwitch) {
+                    if (device instanceof CloudMultiChannelSwitchController) {
                         const { switches } = tmp.params;
                         if (Array.isArray(switches)) {
                             device.updateState(switches.slice(0, device.maxChannel));
@@ -82,6 +75,24 @@ export default async () => {
                     }
                     if (device instanceof CloudRGBLightStripController) {
                         device.updateState(device.parseCkData2Ha(tmp.params));
+                    }
+                }
+
+                if (tmp.action === 'sysmsg' && device?.entityId) {
+                    const { online } = tmp.params;
+                    // 设备下线通知同步到HA
+                    if (!online) {
+                        const res = await getStateByEntityId(device.entityId);
+                        if (res && res.data) {
+                            updateStates(device.entityId, {
+                                entity_id: device.entityId,
+                                state: 'unavailable',
+                                attributes: {
+                                    ...res.data.attributes,
+                                    state: 'unavailable',
+                                },
+                            });
+                        }
                     }
                 }
             }

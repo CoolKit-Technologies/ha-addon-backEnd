@@ -1,5 +1,6 @@
-import { message } from 'coolkit-open-api/dist/api';
 import WebSocket from 'ws';
+import { HaSocketURL } from '../config/config';
+import { HaToken } from '../config/auth';
 import TypeHaSocketMsg from '../ts/type/TypeHaSocketMsg';
 
 class HaSocket {
@@ -7,7 +8,7 @@ class HaSocket {
     client: WebSocket;
     private count: number = 1;
     constructor() {
-        this.client = new WebSocket('http://homeassistant:8123/api/websocket');
+        this.client = new WebSocket(HaSocketURL);
     }
 
     static createInstance() {
@@ -24,8 +25,7 @@ class HaSocket {
                 this.client.send(
                     JSON.stringify({
                         type: 'auth',
-                        access_token:
-                            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIxZmZkNmVlNmQ2ZWI0YjE4ODIzZDk5MTM4NTM3OGY4ZCIsImlhdCI6MTYxNTE4OTY1NCwiZXhwIjoxOTMwNTQ5NjU0fQ.f24cfdrwefx2_g1wbq1azzH9EbEA9NR2_huRkCkw8Uw',
+                        access_token: HaToken,
                     })
                 );
             });
@@ -34,12 +34,13 @@ class HaSocket {
                 (handler = (res: string) => {
                     try {
                         const data = JSON.parse(res);
+                        console.log('Jia ~ file: HASocketClass.ts ~ line 37 ~ HaSocket ~ init ~ data', data);
                         if (data.type === 'auth_ok') {
                             resolve(0);
                             this.client.removeEventListener('message', handler);
                         }
                     } catch (error) {
-                        console.log('Jia ~ file: HaSocketClass.ts ~ line 42 ~ HaSocket ~ returnnewPromise ~ error', error);
+                        console.log('Jia ~ file: HaSocketClass.ts ~ line 42 ~ HaSocket ~ init ~ error', error);
                         resolve(-1);
                     }
                 })
@@ -65,8 +66,38 @@ class HaSocket {
                     handler(data.event.data);
                 }
             } catch (err) {
-                console.log('Jia ~ file: HaSocketClass.ts ~ line 65 ~ HaSocket ~ this.client.on ~ err', err);
+                console.log('Jia ~ file: HaSocketClass.ts ~ line 65 ~ HaSocket ~ handleEvent ~ err', err);
             }
+        });
+    }
+
+    async query(data: Object): Promise<any> {
+        const cur = this.count++;
+        let handler: any;
+
+        return new Promise((resolve) => {
+            this.client.send(
+                JSON.stringify({
+                    id: cur,
+                    ...data,
+                })
+            );
+            this.client.on(
+                'message',
+                (handler = (res: string) => {
+                    console.log('Jia ~ file: HASocketClass.ts ~ line 86 ~ HaSocket ~ returnnewPromise ~ res', res);
+                    try {
+                        const data = JSON.parse(res);
+                        if (data.id === cur) {
+                            resolve(data.result);
+                            this.client.removeEventListener('message', handler);
+                        }
+                    } catch (error) {
+                        console.log('Jia ~ file: HASocketClass.ts ~ line 92 ~ HaSocket ~ query ~ error', error);
+                        resolve(-1);
+                    }
+                })
+            );
         });
     }
 

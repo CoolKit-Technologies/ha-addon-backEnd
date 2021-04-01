@@ -12,6 +12,7 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             ip: data.ip,
             port: data.port,
             type: data.type,
+            rssi: data.txt.data1?.rssi,
         };
     }
 
@@ -24,6 +25,9 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             ip: data.ip,
             port: data.port,
             type: data.type,
+            manufacturer: data.extra?.manufacturer,
+            deviceName: data.deviceName,
+            model: data.extra?.model,
         };
     }
 
@@ -31,12 +35,13 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
         return {
             key: data.deviceId,
             deviceId: data.deviceId,
-            disabled: data.disabled, 
+            disabled: data.disabled,
             uiid: data.uiid,
             type: data.type,
             manufacturer: data.extra.manufacturer,
             deviceName: data.deviceName,
             model: data.extra.model,
+            rssi: data.rssi,
         };
     }
 };

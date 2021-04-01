@@ -19,7 +19,7 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
     power: string;
     state: string;
     constructor(params: ICloudDeviceConstrucotr<ICloudPowerDetectionSwitchParams>) {
-        super();
+        super(params);
         this.deviceId = params.deviceId;
         this.entityId = `switch.${params.deviceId}`;
         this.deviceName = params.deviceName;
@@ -61,6 +61,9 @@ CloudPowerDetectionSwitchController.prototype.updateSwitch = async function (sta
  * @description 更新状态到HA
  */
 CloudPowerDetectionSwitchController.prototype.updateState = async function ({ power, current, voltage, status }) {
+    if (this.disabled) {
+        return;
+    }
     const res = await updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status || this.state,

@@ -1,4 +1,6 @@
-interface ICloudDeviceConstrucotr<T = any> {
+import { ICloudDeviceParams } from './ICloudDeviceParams';
+
+interface ICloudDeviceConstrucotr<T = ICloudDeviceParams> {
     deviceId: string;
     deviceName: string;
     apikey: string;

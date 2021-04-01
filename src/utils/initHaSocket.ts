@@ -7,7 +7,7 @@ import CloudSwitchController from '../controller/CloudSwitchController';
 import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
-import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 import { TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
@@ -19,6 +19,8 @@ export default async () => {
         if (res === 0) {
             HASocket.subscribeEvents('call_service');
             HASocket.handleEvent('call_service', (res: TypeHaSocketCallServiceData) => {
+                console.log('HA触发call_service事件', res);
+
                 const {
                     service_data: { entity_id },
                     service,
@@ -82,8 +84,8 @@ export default async () => {
                     if (device instanceof CloudTandHModificationController) {
                         device.updateSwitch(state);
                     }
-                    
-                    if (device instanceof CloudMultiChannelSwitch) {
+
+                    if (device instanceof CloudMultiChannelSwitchController) {
                         const [id, outlet] = entity_id.split('_');
                         const switches = [
                             {

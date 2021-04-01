@@ -44,7 +44,7 @@ class CloudRGBLightController extends CloudDeviceController {
     parseCkData2Ha!: (params: ICloudRGBLightParams) => { status: string; colorTemp?: number; hsColor?: [number, number]; brightness?: number };
 
     constructor(params: ICloudDeviceConstrucotr<ICloudRGBLightParams>) {
-        super();
+        super(params);
         const { channel0, channel1, channel2, channel3, channel4, zyx_mode, type } = params.params;
         this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
@@ -55,16 +55,16 @@ class CloudRGBLightController extends CloudDeviceController {
         this.disabled = params.disabled!;
         switch (type) {
             case 'cold':
-                this.colorTemp = 0;
+                this.colorTemp = 1;
                 break;
             case 'middle':
-                this.colorTemp = 50;
+                this.colorTemp = 2;
                 break;
             case 'warm':
-                this.colorTemp = 100;
+                this.colorTemp = 3;
                 break;
             default:
-                this.colorTemp = 50;
+                this.colorTemp = 2;
                 break;
         }
         this.brightness = Math.max(+channel0, +channel1);
@@ -101,10 +101,10 @@ CloudRGBLightController.prototype.parseHaData2Ck = function ({
         [channel2, channel3, channel4] = this.parseHS2RGB(hs_color);
     }
     if (color_temp) {
-        if (color_temp < 34) {
+        if (color_temp === 1) {
             type = 'cold';
             channel0 = this.brightness || 128;
-        } else if (color_temp > 67) {
+        } else if (color_temp === 3) {
             type = 'warm';
             channel1 = this.brightness || 128;
         } else {
@@ -144,13 +144,13 @@ CloudRGBLightController.prototype.parseCkData2Ha = function (params: ICloudRGBLi
     }
     switch (type) {
         case 'cold':
-            temp = 0;
+            temp = 1;
             break;
         case 'middle':
-            temp = 50;
+            temp = 2;
             break;
         case 'warm':
-            temp = 100;
+            temp = 3;
             break;
     }
     return {
@@ -162,6 +162,9 @@ CloudRGBLightController.prototype.parseCkData2Ha = function (params: ICloudRGBLi
 };
 
 CloudRGBLightController.prototype.updateLight = async function (params) {
+    if (this.disabled) {
+        return;
+    }
     const res = await coolKitWs.updateThing({
         deviceApikey: this.apikey,
         deviceid: this.deviceId,
@@ -176,16 +179,16 @@ CloudRGBLightController.prototype.updateLight = async function (params) {
     }
     switch (type) {
         case 'cold':
-            this.colorTemp = 0;
+            this.colorTemp = 1;
             break;
         case 'middle':
-            this.colorTemp = 50;
+            this.colorTemp = 2;
             break;
         case 'warm':
-            this.colorTemp = 100;
+            this.colorTemp = 3;
             break;
         default:
-            this.colorTemp = 50;
+            this.colorTemp = 2;
             break;
     }
     if (res.error === 0) {
@@ -207,6 +210,8 @@ CloudRGBLightController.prototype.updateState = async function ({ status, bright
             supported_features: 19,
             friendly_name: this.deviceName,
             state: status,
+            min_mireds: 1,
+            max_mireds: 3,
             brightness: brightness !== undefined ? brightness : this.brightness,
             color_temp: colorTemp !== undefined ? colorTemp : this.colorTemp,
             hs_color: hsColor || this.hsColor,

@@ -4,8 +4,8 @@
 FROM node:current-alpine3.13
 
 COPY ["./dist", "./package.json", "/workspace/"]
-VOLUME ["/workspace/data"]
 WORKDIR /workspace
+VOLUME /workspace/data
 RUN yarn add coolkit-open-api coolkit-ws --registry http://172.16.9.22:4873/ \
     yarn --production
 EXPOSE 3000

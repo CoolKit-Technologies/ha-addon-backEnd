@@ -15,7 +15,7 @@ class CloudDimmingController extends CloudDeviceController {
     updateLight!: (params: { switch: string; bright?: number }) => Promise<void>;
     updateState!: (params: { status: string; bright: number }) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ICloudDimmingParams>) {
-        super();
+        super(params);
         this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
         this.deviceName = params.deviceName;
@@ -27,23 +27,22 @@ class CloudDimmingController extends CloudDeviceController {
 }
 
 CloudDimmingController.prototype.updateLight = async function (params) {
+    console.log('Jia ~ file: CloudDimmingController.ts ~ line 30 ~ params', params);
     const res = await coolKitWs.updateThing({
         deviceApikey: this.apikey,
         deviceid: this.deviceId,
         params,
     });
-    // todo
-    if (res.error === 0) {
-        // this.updateState({
-        //     status: params.state!,
-        // });
-    }
+    console.log('Jia ~ file: CloudDimmingController.ts ~ line 35 ~ res', res);
 };
 
 /**
  * @description 更新状态到HA
  */
 CloudDimmingController.prototype.updateState = async function ({ status, bright }) {
+    if (this.disabled) {
+        return;
+    }
     updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status,

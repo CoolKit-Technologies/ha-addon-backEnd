@@ -5,7 +5,7 @@ const supervisorRequest = axios.create({
     baseURL: 'http://supervisor',
     headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${SUPERVISOR_TOKEN}`,
+        'X-Supervisor-Token': `Bearer ${SUPERVISOR_TOKEN}`,
     },
 });
 
@@ -13,6 +13,9 @@ const getAuth = async () => {
     return supervisorRequest({
         method: 'GET',
         url: '/auth',
+    }).catch((e) => {
+        console.log(e);
+        return null;
     });
 };
 

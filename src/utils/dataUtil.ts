@@ -1,9 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
+import { debugMode } from '../config/config';
+
+let basePath = path.join('/data');
+
+if (debugMode) {
+    basePath = path.join(__dirname, '../data');
+}
+
 const getDataSync = (fileName: string, namePath: string[] = []) => {
     try {
-        const data = fs.readFileSync(path.join('./src/data', `/${fileName}`), { encoding: 'utf-8' });
+        const data = fs.readFileSync(path.join(basePath, `/${fileName}`), { encoding: 'utf-8' });
         return namePath.reduce((cur, path: string) => cur[path], JSON.parse(data));
     } catch (err) {
         console.log('getDataSync-> no data');
@@ -14,9 +22,9 @@ const getDataSync = (fileName: string, namePath: string[] = []) => {
 const saveData = async (fileName: string, data: string): Promise<-1 | 0> => {
     try {
         return new Promise((resolve, reject) => {
-            fs.writeFile(path.join('./src/data', `/${fileName}`), data, (err) => {
+            fs.writeFile(path.join(basePath, `/${fileName}`), data, (err) => {
                 if (err) {
-                    console.log('Jia ~ file: dataUtil.ts ~ line 23 ~ fs.writeFile ~ err', err);
+                    console.log('Jia ~ file: data Util.ts ~ line 23 ~ fs.writeFile ~ err', err);
                     resolve(-1);
                 }
                 resolve(0);

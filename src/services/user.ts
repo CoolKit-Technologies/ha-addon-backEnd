@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import CkApi from 'coolkit-open-api';
-import { saveData, clearData } from '../utils/dataUtil';
+import { saveData, clearData, getDataSync } from '../utils/dataUtil';
 import getThings from '../utils/getThings';
+import Controller from '../controller/Controller';
+import coolKitWs from 'coolkit-ws';
+import { appId, appSecret } from '../config/app';
+import _ from 'lodash';
 
 /**
  * @param {string} lang
@@ -20,8 +24,17 @@ const login = async (req: Request, res: Response) => {
             password,
             email,
         });
+        console.log('Jia ~ file: user.ts ~ line 26 ~ login ~ result', result);
         if (result.error === 0) {
             saveData('user.json', JSON.stringify({ ...result.data, login: { ...req.body } }));
+            const at = _.get(result, ['data', 'at']);
+            const apikey = _.get(result, ['data', 'user', 'apikey']);
+            await coolKitWs.init({
+                appid: appId,
+                secret: appSecret,
+                at,
+                apikey,
+            });
             await getThings();
         }
         res.json(result);
@@ -33,12 +46,15 @@ const login = async (req: Request, res: Response) => {
 const logout = async (req: Request, res: Response) => {
     try {
         const result = await clearData('user.json');
-        if (result === 0) {
-            res.json({
-                error: 0,
-                data: null,
-            });
-        }
+        console.log('Jia ~ file: user.ts ~ line 37 ~ logout ~ result', result);
+        clearData('disabled.json');
+        Controller.deviceMap.clear();
+        const ckRes = await CkApi.user.logout();
+        console.log('Jia ~ file: user.ts ~ line 41 ~ logout ~ ckRes', ckRes);
+        res.json({
+            error: 0,
+            data: null,
+        });
     } catch (err) {
         console.log(err);
         res.json({

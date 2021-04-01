@@ -7,13 +7,15 @@ import CloudTandHModificationController from '../controller/CloudTandHModificati
 import CloudRGBLightController from '../controller/CloudRGBLightController';
 import CloudDimmingController from '../controller/CloudDimmingController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
-import CloudMultiChannelSwitch from '../controller/CloudMultiChannelSwitch';
+import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import { getMaxChannelByUiid } from '../config/channelMap';
 
 // 获取设备并同步到HA
 export default async () => {
     const { error, data } = await CkApi.device.getThingList({
+        // todo
         lang: 'cn',
     });
     if (error === 0) {
@@ -21,7 +23,10 @@ export default async () => {
         for (let i = 0; i < thingList.length; i++) {
             const item = thingList[i];
             if (item.itemType < 3) {
-                const { extra, deviceid, name, params, devicekey, apikey } = item.itemData;
+                const { extra, deviceid, name, params, devicekey, apikey, online } = item.itemData;
+                if (!online) {
+                    continue;
+                }
                 const old = Controller.getDevice(deviceid!);
                 if (old instanceof DiyController) {
                     // 如果设备已经存在并且是DIY设备就不做任何操作
@@ -32,17 +37,9 @@ export default async () => {
                     old.devicekey = devicekey;
                     old.selfApikey = apikey;
                     old.deviceName = name;
+                    old.extra = extra;
                     if (old instanceof LanMultiChannelSwitchController) {
-                        switch (extra.uiid) {
-                            case 4:
-                                old.maxChannel = 4;
-                                break;
-                            case 7:
-                                old.maxChannel = 2;
-                                break;
-                            default:
-                                break;
-                        }
+                        old.maxChannel = getMaxChannelByUiid(extra.uiid);
                         const decryptData = old.parseEncryptedData() as any;
                         if (decryptData) {
                             old.updateState(decryptData.switches);
@@ -59,36 +56,38 @@ export default async () => {
                 });
 
                 if (device instanceof CloudSwitchController) {
-                    device.updateState(params.switch);
+                    !device.disabled && device.updateState(params.switch);
                 }
                 if (device instanceof CloudTandHModificationController) {
-                    device.updateState(params.switch);
-                    device.updateTandH(params.currentTemperature, params.currentHumidity);
+                    !device.disabled && device.updateState(params.switch);
+                    !device.disabled && device.updateTandH(params.currentTemperature, params.currentHumidity);
                 }
                 if (device instanceof CloudRGBLightController) {
-                    device.updateState(device.parseCkData2Ha(params));
+                    !device.disabled && device.updateState(device.parseCkData2Ha(params));
                 }
                 if (device instanceof CloudDimmingController) {
-                    device.updateState({
-                        status: params.switch,
-                        bright: params.bright,
-                    });
+                    !device.disabled &&
+                        device.updateState({
+                            status: params.switch,
+                            bright: params.bright,
+                        });
                 }
                 if (device instanceof CloudPowerDetectionSwitchController) {
                     const { switch: status, power, voltage, current } = params;
-                    device.updateState({
-                        status,
-                        power,
-                        voltage,
-                        current,
-                    });
+                    !device.disabled &&
+                        device.updateState({
+                            status,
+                            power,
+                            voltage,
+                            current,
+                        });
                 }
-                if (device instanceof CloudMultiChannelSwitch) {
-                    device.updateState(params.switches.slice(0, device.maxChannel));
+                if (device instanceof CloudMultiChannelSwitchController) {
+                    !device.disabled && device.updateState(params.switches.slice(0, device.maxChannel));
                 }
                 if (device instanceof CloudRGBLightStripController) {
                     const data = device.parseCkData2Ha(params);
-                    device.updateState(data);
+                    !device.disabled && device.updateState(data);
                 }
             }
         }

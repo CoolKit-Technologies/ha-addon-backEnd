@@ -24,15 +24,19 @@ export default () => {
             if (device instanceof DiyController) {
                 console.log('found diy device');
                 const diyDevice = formatDiyDevice(device as TypeDiyDevice);
-                device.updateState(diyDevice.data?.switch!);
+                !device.disabled && device.updateState(diyDevice.data?.switch!);
             }
             if (device instanceof LanSwitchController) {
-                // todo
-                console.log('found lan switch');
+                const decryptData = device.parseEncryptedData();
+                if(decryptData) {
+                    device.updateState(decryptData.switch);
+                }
             }
             if (device instanceof LanMultiChannelSwitchController) {
-                // todo
-                console.log('found lan multiChannelSwitch');
+                const decryptData = device.parseEncryptedData();
+                if (decryptData) {
+                    device.updateState(decryptData.switches);
+                }
             }
         },
     });

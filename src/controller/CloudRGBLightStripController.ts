@@ -48,7 +48,7 @@ class CloudRGBLightStripController extends CloudDeviceController {
     };
 
     constructor(params: ICloudDeviceConstrucotr<ICloudRGBLightStripParams>) {
-        super();
+        super(params);
         this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
         this.deviceName = params.deviceName;
@@ -130,6 +130,9 @@ CloudRGBLightStripController.prototype.updateLight = async function (params) {
  * @description 更新状态到HA
  */
 CloudRGBLightStripController.prototype.updateState = async function ({ status, brightness, hs_color, mode, speed, sensitive }) {
+    if (this.disabled) {
+        return;
+    }
     updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status,

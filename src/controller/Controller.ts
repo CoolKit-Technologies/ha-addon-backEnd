@@ -20,11 +20,12 @@ import _ from 'lodash';
 import CloudRGBLightController from './CloudRGBLightController';
 import CloudDimmingController from './CloudDimmingController';
 import CloudPowerDetectionSwitchController from './CloudPowerDetectionSwitchController';
-import CloudMultiChannelSwitch from './CloudMultiChannelSwitch';
+import CloudMultiChannelSwitchController from './CloudMultiChannelSwitchController';
 import CloudRGBLightStripController from './CloudRGBLightStripController';
 import formatLanDevice from '../utils/formatLanDevice';
 import LanSwitchController from './LanSwitchController';
 import LanMultiChannelSwitchController from './LanMultiChannelSwitchController';
+import { multiChannelSwitchUiidSet, switchUiidSet } from '../config/uiid';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -62,6 +63,9 @@ class Controller {
         // DIY
         if (type === 1) {
             const tmp = data as TypeMdnsDiyDevice;
+            if (tmp.a) {
+                return;
+            }
             const diyDevice = new DiyDeviceController({
                 ip: tmp.a,
                 port: tmp.srv.port,
@@ -75,7 +79,9 @@ class Controller {
         // LAN
         if (type === 2) {
             const params = formatLanDevice(data as TypeLanDevice);
-            if (!params) {
+            // 如果ip不存在说明该设备可能不支持局域网
+            if (!params || !params.ip) {
+                console.log('该设备不支持局域网', params);
                 return;
             }
             const old = Controller.getDevice(id);
@@ -105,8 +111,7 @@ class Controller {
         }
         // CLOUD
         if (type === 4) {
-            // 1->单通道插座;6->单通道开关;14->开关改装模块
-            if (data.extra.uiid === 1 || data.extra.uiid === 6 || data.extra.uiid === 14) {
+            if (switchUiidSet.has(data.extra.uiid)) {
                 const tmp = data as ICloudDevice<ICloudSwitchParams>;
                 const switchDevice = new CloudSwitchController({
                     deviceId: tmp.deviceid,
@@ -119,10 +124,9 @@ class Controller {
                 Controller.deviceMap.set(id, switchDevice);
                 return switchDevice;
             }
-            // 4->四通道插座; 7->双通道开关
-            if (data.extra.uiid === 4 || data.extra.uiid === 7) {
+            if (multiChannelSwitchUiidSet.has(data.extra.uiid)) {
                 const tmp = data as ICloudDevice<ICloudMultiChannelSwitchParams>;
-                const device = new CloudMultiChannelSwitch({
+                const device = new CloudMultiChannelSwitchController({
                     deviceId: tmp.deviceid,
                     deviceName: tmp.name,
                     apikey: tmp.apikey,

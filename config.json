@@ -1,13 +1,13 @@
 {
     "name": "smart home",
-    "version": "0.1",
+    "version": "1.0-beta",
     "slug": "smart_home_slug",
     "description": "smart home_description",
     "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
     "startup": "application",
     "boot": "auto",
     "url": "http://www.baidu.com",
-    "host_network": true,
+    "host_network": false,
     "ports": {
         "3000/tcp": 3000
     },
@@ -21,5 +21,11 @@
     "homeassistant_api": true,
     "ingress": true,
     "ingress_port": 3000,
-    "ingress_entry": ""
+    "ingress_entry": "",
+    "options": {
+        "auth": ""
+    },
+    "schema": {
+        "auth": "str"
+    }
 }

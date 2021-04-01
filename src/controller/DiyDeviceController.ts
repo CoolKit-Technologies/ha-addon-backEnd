@@ -43,6 +43,9 @@ DiyController.prototype.setSwitch = async function (status) {
         });
 };
 DiyController.prototype.updateState = async function (status) {
+    if (this.disabled) {
+        return;
+    }
     updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status,
@@ -53,7 +56,7 @@ DiyController.prototype.updateState = async function (status) {
             state: status,
         },
     }).catch((e) => {
-        console.log('更新到HA出错，设备id：', this.deviceId);
+        console.log('更新Diy设备到HA出错，设备id：', this.deviceId);
     });
 };
 

@@ -15,7 +15,7 @@ class CloudSwitchController extends CloudDeviceController {
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ICloudSwitchParams>) {
-        super();
+        super(params);
         this.deviceId = params.deviceId;
         this.entityId = `switch.${params.deviceId}`;
         this.deviceName = params.deviceName;
@@ -44,6 +44,9 @@ CloudSwitchController.prototype.updateSwitch = async function (status) {
  * @description 更新状态到HA
  */
 CloudSwitchController.prototype.updateState = async function (status) {
+    if (this.disabled) {
+        return;
+    }
     updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status,

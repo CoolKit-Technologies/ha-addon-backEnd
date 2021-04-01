@@ -5,12 +5,14 @@ import { Request, Response } from 'express';
 import cors from 'cors';
 import userRouter from './route/user';
 import devicesRouter from './route/devices';
+import languageRouter from './route/language';
 import initMdns from './utils/initMdns';
 import initCkWs from './utils/initCkWs';
 import initHaSocket from './utils/initHaSocket';
 import initCkApi from './utils/initCkApi';
 import { appId, appSecret } from './config/app';
 import sleep from './utils/sleep';
+import { debugMode } from './config/config';
 
 CkApi.init({
     appId,
@@ -28,27 +30,23 @@ CkApi.init({
 const app = express();
 const port = 3000;
 const apiPrefix = '/api';
-const debugMode = false;
+app.use('/', express.static(path.join(__dirname, '/pages')));
+
 if (debugMode) {
     app.use(cors());
-    app.use('/', express.static('src/pages'));
-} else {
-    app.use('/', express.static('pages'));
 }
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(`${apiPrefix}/user`, userRouter);
 app.use(`${apiPrefix}/devices`, devicesRouter);
+app.use(`${apiPrefix}/language`, languageRouter);
 
 app.use('/', (req: Request, res: Response) => {
     res.type('.html');
     res.sendFile(path.join(__dirname, '/pages/index.html'));
 });
 
-app.use((req: Request, res: Response) => {
-    res.status(404).send("Sorry can't find that!");
-});
 
 app.listen(port, () => {
     console.log(`server is running at ${port}`);

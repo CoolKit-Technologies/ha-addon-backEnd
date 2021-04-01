@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
 import Controller from '../controller/Controller';
-import { getDataSync } from '../utils/dataUtil';
 import getThings from '../utils/getThings';
 import sleep from '../utils/sleep';
 import initMdns from '../utils/initMdns';
 import modifyDeviceStatus from '../utils/modifyDeviceStatus';
 import formatDevice from '../utils/formatDevice';
+import { removeStates } from '../apis/restApi';
+import CloudTandHModificationController from '../controller/CloudTandHModificationController';
+import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
+import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 
 const mdns = initMdns();
 
@@ -21,7 +24,6 @@ const getDevices = async (req: Request, res: Response) => {
         }
 
         if (refresh) {
-            console.log('Jia ~ file: devices.ts ~ line 23 ~ getDevices ~ mdns', mdns);
             mdns.query({
                 questions: [
                     {
@@ -30,9 +32,8 @@ const getDevices = async (req: Request, res: Response) => {
                     },
                 ],
             });
-            const lang = getDataSync('user.json', ['login', 'lang']);
             await getThings();
-            await sleep(5000);
+            await sleep(1000);
         }
 
         const [cloud, lan, diy] = (+type!).toString(2).padStart(3, '0').split('');
@@ -73,6 +74,40 @@ const disableDevice = async (req: Request, res: Response) => {
         }
         device!.disabled = disabled;
         const error = await modifyDeviceStatus(id, disabled);
+        if (device && disabled) {
+            if (device instanceof CloudTandHModificationController) {
+                removeStates(device.entityId);
+                removeStates(`sensor.${device.deviceId}_h`);
+                removeStates(`sensor.${device.deviceId}_t`);
+            }
+            if (device instanceof CloudMultiChannelSwitchController) {
+                for (let i = 0; i < device.maxChannel; i++) {
+                    removeStates(`${device.entityId}_${i + 1}`);
+                }
+            }
+            if (device instanceof LanMultiChannelSwitchController) {
+                if (device.maxChannel) {
+                    for (let i = 0; i < device.maxChannel; i++) {
+                        removeStates(`${device.entityId}_${i + 1}`);
+                    }
+                }
+            }
+            removeStates(device.entityId);
+        }
+
+        if (!disabled) {
+            mdns.query({
+                questions: [
+                    {
+                        name: '_ewelink._tcp.local',
+                        type: 'PTR',
+                    },
+                ],
+            });
+            await getThings();
+            // todo
+            await sleep(2000);
+        }
         if (error === 0) {
             res.json({
                 error: 0,

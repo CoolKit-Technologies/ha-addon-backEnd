@@ -6,6 +6,7 @@ import coolKitWs from 'coolkit-ws';
 class CloudTandHModificationController extends CloudDeviceController {
     disabled: boolean;
     deviceId: string;
+    entityId: string;
     deviceName: string;
     apikey: string;
     uiid: number = 15;
@@ -15,12 +16,13 @@ class CloudTandHModificationController extends CloudDeviceController {
     updateState!: (status: string) => Promise<void>;
     updateTandH!: (currentTemperature: string, currentHumidity: string) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ITemperatureAndHumidityModificationParams>) {
-        super();
+        super(params);
         this.deviceId = params.deviceId;
         this.deviceName = params.deviceName;
         this.apikey = params.apikey;
         this.params = params.params;
         this.extra = params.extra;
+        this.entityId = `switch.${params.deviceId}`;
         this.disabled = params.disabled || false;
     }
 }
@@ -42,6 +44,9 @@ CloudTandHModificationController.prototype.updateSwitch = async function (status
  * @description 更新状态到HA
  */
 CloudTandHModificationController.prototype.updateState = async function (status) {
+    if (this.disabled) {
+        return;
+    }
     updateStates(`switch.${this.deviceId}`, {
         entity_id: `switch.${this.deviceId}`,
         state: status,
@@ -55,7 +60,7 @@ CloudTandHModificationController.prototype.updateState = async function (status)
 };
 CloudTandHModificationController.prototype.updateTandH = async function (currentTemperature, currentHumidity) {
     updateStates(`sensor.${this.deviceId}_t`, {
-        entity_id: `switch.${this.deviceId}`,
+        entity_id: `sensor.${this.deviceId}_t`,
         state: currentTemperature,
         attributes: {
             restored: true,
@@ -67,7 +72,7 @@ CloudTandHModificationController.prototype.updateTandH = async function (current
         },
     });
     updateStates(`sensor.${this.deviceId}_h`, {
-        entity_id: `switch.${this.deviceId}`,
+        entity_id: `sensor.${this.deviceId}_h`,
         state: currentHumidity,
         attributes: {
             restored: true,

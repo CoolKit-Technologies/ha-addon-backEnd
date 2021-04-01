@@ -6,7 +6,7 @@ export default async () => {
     if (loginParams) {
         const result = await CkApi.user.login(loginParams);
         if (result.error === 0) {
-            saveData('user.json', JSON.stringify({ ...result.data, login: loginParams }));
+            await saveData('user.json', JSON.stringify({ ...result.data, login: loginParams }));
             await getThings();
         }
     }

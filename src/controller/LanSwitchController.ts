@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { setSwitch } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
+import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import AuthUtils from '../utils/lanControlAuthenticationUtils';
 import LanDeviceController from './LanDeviceController';
 type TypeConstrucotr = {
@@ -23,6 +24,7 @@ class LanSwitchController extends LanDeviceController {
     devicekey?: string;
     selfApikey?: string;
     deviceName?: string;
+    extra?: ICloudDeviceConstrucotr['extra'];
     setSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<any>;
     constructor({ deviceId, ip, port = 8081, disabled, encryptedData, iv }: TypeConstrucotr) {
@@ -40,7 +42,7 @@ class LanSwitchController extends LanDeviceController {
 LanSwitchController.prototype.setSwitch = async function (status) {
     // let apikey = getDataSync('user.json', ['user', 'apikey']);
     if (this.devicekey && this.selfApikey) {
-        const { data } = await setSwitch({
+        const res = await setSwitch({
             ip: this.ip,
             port: this.port,
             deviceid: this.deviceId,
@@ -50,13 +52,16 @@ LanSwitchController.prototype.setSwitch = async function (status) {
                 switch: status,
             }),
         });
-        if (data && data.error === 0) {
+        if (res?.data && res.data.error === 0) {
             this.updateState(status);
         }
     }
 };
 
 LanSwitchController.prototype.updateState = async function (status) {
+    if (this.disabled) {
+        return;
+    }
     const res = await updateStates(this.entityId, {
         entity_id: this.entityId,
         state: status,
@@ -67,7 +72,6 @@ LanSwitchController.prototype.updateState = async function (status) {
             state: status,
         },
     });
-    console.log(res);
 };
 
 export default LanSwitchController;
