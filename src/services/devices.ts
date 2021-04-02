@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import CkApi from 'coolkit-open-api';
 import Controller from '../controller/Controller';
 import getThings from '../utils/getThings';
 import sleep from '../utils/sleep';
@@ -128,4 +129,39 @@ const disableDevice = async (req: Request, res: Response) => {
     }
 };
 
-export { getDevices, disableDevice };
+const updateDeviceName = async (req: Request, res: Response) => {
+    try {
+        const { newName, id } = req.body;
+        const device = Controller.getDevice(id);
+        if (!device) {
+            res.json({
+                error: 402,
+                msg: 'not such device',
+            });
+        }
+        const { error } = await CkApi.device.updateDeviceInfo({
+            deviceid: id,
+            name: newName,
+        });
+        if (error === 0) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error: 500,
+                data: null,
+            });
+        }
+        await getThings();
+    } catch (err) {
+        console.log('Jia ~ file: devices.ts ~ line 71 ~ disableDevice ~ err', err);
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+export { getDevices, disableDevice, updateDeviceName };

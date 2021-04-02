@@ -12,6 +12,7 @@ import CloudRGBLightStripController from '../controller/CloudRGBLightStripContro
 import { TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
+import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 
 export default async () => {
     try {
@@ -106,6 +107,21 @@ export default async () => {
                         const { hs_color, color_temp, brightness_pct = 0 } = res.service_data;
                         const params = device.parseHaData2Ck({ hs_color, brightness_pct, state });
                         device.updateLight(params);
+                    }
+
+                    if (device instanceof CloudDoubleColorLightController) {
+                        if (state === 'off') {
+                            device.updateLight({
+                                switch: state,
+                            });
+                            return;
+                        }
+                        const { color_temp, brightness_pct } = res.service_data;
+                        device.updateLight({
+                            switch: state,
+                            ct: color_temp,
+                            br: brightness_pct,
+                        });
                     }
                 }
             });

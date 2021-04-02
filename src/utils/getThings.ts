@@ -11,6 +11,8 @@ import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSw
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import { getMaxChannelByUiid } from '../config/channelMap';
+import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
+import LanSwitchController from '../controller/LanSwitchController';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -38,6 +40,12 @@ export default async () => {
                     old.selfApikey = apikey;
                     old.deviceName = name;
                     old.extra = extra;
+                    if (old instanceof LanSwitchController) {
+                        const decryptData = old.parseEncryptedData() as any;
+                        if (decryptData) {
+                            old.updateState(decryptData.switch);
+                        }
+                    }
                     if (old instanceof LanMultiChannelSwitchController) {
                         old.maxChannel = getMaxChannelByUiid(extra.uiid);
                         const decryptData = old.parseEncryptedData() as any;
@@ -88,6 +96,9 @@ export default async () => {
                 if (device instanceof CloudRGBLightStripController) {
                     const data = device.parseCkData2Ha(params);
                     !device.disabled && device.updateState(data);
+                }
+                if (device instanceof CloudDoubleColorLightController) {
+                    !device.disabled && device.updateState(params);
                 }
             }
         }

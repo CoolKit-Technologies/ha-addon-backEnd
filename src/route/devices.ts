@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDevices, disableDevice } from '../services/devices';
+import { getDevices, disableDevice, updateDeviceName } from '../services/devices';
 const router = express.Router();
 
 router.get('/', getDevices);
@@ -13,5 +13,6 @@ router.get(
 );
 
 router.post('/disabled', disableDevice);
+router.post('/updateName', updateDeviceName);
 
 export default router;

@@ -1,3 +1,5 @@
+import { TypeLtypeParams, TypeLtype } from '../type/TypeLtype';
+
 interface ICloudDeviceParams {
     bindInfos: any;
     version: number;
@@ -56,6 +58,12 @@ interface ICloudRGBLightParams extends ICloudDeviceParams {
     zyx_mode: number;
 }
 
+type IDoubleCloudLightParams = ICloudDeviceParams &
+    TypeLtypeParams & {
+        switch: string;
+        ltype: TypeLtype;
+    };
+
 interface ICloudDimmingParams extends ICloudDeviceParams {
     switch: string;
     bright: number;
@@ -101,4 +109,5 @@ export {
     ICloudPowerDetectionSwitchParams,
     ICloudMultiChannelSwitchParams,
     ICloudRGBLightStripParams,
+    IDoubleCloudLightParams,
 };

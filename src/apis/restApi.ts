@@ -23,7 +23,7 @@ const updateStates = async (entityId: string, data: any) => {
         url: `/api/states/${entityId}`,
         data,
     }).catch((e) => {
-        console.log('更新设备到HA出错：', entityId);
+        console.log('更新设备到HA出错：', entityId, '\ndata: ', data);
     });
 };
 

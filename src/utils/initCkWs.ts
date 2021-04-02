@@ -11,6 +11,7 @@ import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSw
 import CloudRGBLightStripController from '../controller/CloudRGBLightStripController';
 import { IPowerDetectionSwitchSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
 import { getStateByEntityId, updateStates } from '../apis/restApi';
+import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 
 const at = getDataSync('user.json', ['at']);
 const apikey = getDataSync('user.json', ['user', 'apikey']);
@@ -75,6 +76,10 @@ export default async () => {
                     }
                     if (device instanceof CloudRGBLightStripController) {
                         device.updateState(device.parseCkData2Ha(tmp.params));
+                    }
+                    if (device instanceof CloudDoubleColorLightController) {
+                        console.log('接收到双色灯的信息：', tmp.params);
+                        device.updateState(tmp.params);
                     }
                 }
 

@@ -1,4 +1,5 @@
 import ICloudDevice from '../ts/interface/ICloudDevice';
+import _ from 'lodash';
 import {
     ICloudDimmingParams,
     ICloudMultiChannelSwitchParams,
@@ -6,6 +7,7 @@ import {
     ICloudRGBLightParams,
     ICloudRGBLightStripParams,
     ICloudSwitchParams,
+    IDoubleCloudLightParams,
     ITemperatureAndHumidityModificationParams,
 } from '../ts/interface/ICloudDeviceParams';
 import TypeMdnsDiyDevice from '../ts/type/TypeMdnsDiyDevice';
@@ -16,7 +18,6 @@ import DiyDeviceController from './DiyDeviceController';
 import { getDataSync } from '../utils/dataUtil';
 import TypeLanDevice from '../ts/type/TypeMdnsLanDevice';
 import LanDeviceController from './LanDeviceController';
-import _ from 'lodash';
 import CloudRGBLightController from './CloudRGBLightController';
 import CloudDimmingController from './CloudDimmingController';
 import CloudPowerDetectionSwitchController from './CloudPowerDetectionSwitchController';
@@ -26,6 +27,7 @@ import formatLanDevice from '../utils/formatLanDevice';
 import LanSwitchController from './LanSwitchController';
 import LanMultiChannelSwitchController from './LanMultiChannelSwitchController';
 import { multiChannelSwitchUiidSet, switchUiidSet } from '../config/uiid';
+import CloudDoubleColorLightController from './CloudDoubleColorLightController';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -197,6 +199,20 @@ class Controller {
             if (data.extra.uiid === 59) {
                 const tmp = data as ICloudDevice<ICloudRGBLightStripParams>;
                 const device = new CloudRGBLightStripController({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, device);
+                return device;
+            }
+            // 双色冷暖灯
+            if (data.extra.uiid === 103) {
+                const tmp = data as ICloudDevice<IDoubleCloudLightParams>;
+                const device = new CloudDoubleColorLightController({
                     deviceId: tmp.deviceid,
                     deviceName: tmp.name,
                     apikey: tmp.apikey,
