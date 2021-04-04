@@ -2,6 +2,14 @@ import CloudDeviceController from '../controller/CloudDeviceController';
 import DiyController from '../controller/DiyDeviceController';
 import _ from 'lodash';
 import LanDeviceController from '../controller/LanDeviceController';
+
+const ghostManufacturer = (manufacturer: string = 'eWeLink') => {
+    if (~manufacturer.indexOf('松诺') || ~manufacturer.toLocaleUpperCase().indexOf('SONOFF')) {
+        return 'SONOFF';
+    }
+    return 'eWeLink';
+};
+
 export default (data: DiyController | CloudDeviceController | LanDeviceController) => {
     if (data instanceof DiyController) {
         return {
@@ -25,7 +33,7 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             ip: data.ip,
             port: data.port,
             type: data.type,
-            manufacturer: data.extra?.manufacturer,
+            manufacturer: ghostManufacturer(data.extra?.manufacturer),
             deviceName: data.deviceName,
             model: data.extra?.model,
         };
@@ -38,7 +46,7 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             disabled: data.disabled,
             uiid: data.uiid,
             type: data.type,
-            manufacturer: data.extra.manufacturer,
+            manufacturer: ghostManufacturer(data.extra.manufacturer),
             deviceName: data.deviceName,
             model: data.extra.model,
             rssi: data.rssi,
