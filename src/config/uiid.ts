@@ -10,6 +10,10 @@ const multiChannelSwitchUiidSet = new Set<number>([
     4, // 四通道插座
     7, // 双通道开关
     8, // 三通道开关
+    77, // 单通道插座-多通道版
+    112, // 单通道开关微波雷达版
+    113, // 双通道开关微波雷达版
+    114, // 三通道开关微波雷达版
 ]);
 
 export { switchUiidSet, multiChannelSwitchUiidSet };

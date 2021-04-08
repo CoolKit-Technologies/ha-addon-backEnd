@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { HaToken } from '../config/auth';
+import { HaRestURL } from '../config/url';
 
 const restRequest = axios.create({
-    baseURL: 'http://homeassistant:8123',
+    baseURL: HaRestURL,
     headers: {
         Authorization: `Bearer ${HaToken}`,
     },

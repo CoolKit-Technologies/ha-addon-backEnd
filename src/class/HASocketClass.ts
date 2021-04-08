@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
-import { HaSocketURL } from '../config/config';
 import { HaToken } from '../config/auth';
+import { HaSocketURL } from '../config/url';
 import TypeHaSocketMsg from '../ts/type/TypeHaSocketMsg';
 
 class HaSocket {

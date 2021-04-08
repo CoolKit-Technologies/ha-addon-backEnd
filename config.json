@@ -23,9 +23,11 @@
     "ingress_port": 3000,
     "ingress_entry": "",
     "options": {
-        "auth": ""
+        "auth": "",
+        "home_assistant_port": 8123
     },
     "schema": {
-        "auth": "str"
+        "auth": "str",
+        "home_assistant_port": "int"
     }
 }
