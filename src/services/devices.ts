@@ -10,6 +10,7 @@ import { removeStates } from '../apis/restApi';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import { updateDeviceNameAPI } from '../apis/ckApi';
 
 const mdns = initMdns();
 
@@ -139,10 +140,7 @@ const updateDeviceName = async (req: Request, res: Response) => {
                 msg: 'not such device',
             });
         }
-        const { error } = await CkApi.device.updateDeviceInfo({
-            deviceid: id,
-            name: newName,
-        });
+        const { error } = await updateDeviceNameAPI(id, newName);
         if (error === 0) {
             res.json({
                 error: 0,

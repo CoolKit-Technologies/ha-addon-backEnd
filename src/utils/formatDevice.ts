@@ -50,6 +50,7 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             deviceName: data.deviceName,
             model: data.extra.model,
             rssi: data.rssi,
+            apikey: data.apikey,
         };
     }
 };

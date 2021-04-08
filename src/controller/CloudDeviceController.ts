@@ -3,6 +3,7 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 abstract class CloudDeviceController {
     type: number = 4;
     rssi: number;
+    apikey: string;
     abstract deviceName: string;
     abstract uiid: number;
     abstract deviceId: string;
@@ -11,6 +12,7 @@ abstract class CloudDeviceController {
     abstract extra: ICloudDeviceConstrucotr['extra'];
     constructor(data: ICloudDeviceConstrucotr) {
         this.rssi = data.params.rssi;
+        this.apikey = data.apikey;
     }
 }
 
