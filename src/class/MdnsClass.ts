@@ -95,6 +95,7 @@ export default class Mdns {
                     return;
                 }
                 if (tmp.txt?.type === 'diy_plug') {
+                    console.log('发现diy设备');
                     const diyDevice = Controller.setDevice({
                         id: key,
                         data: tmp as TypeDiyDevice,

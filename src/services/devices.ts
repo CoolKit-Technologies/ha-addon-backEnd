@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import CkApi from 'coolkit-open-api';
+import CkWs from 'coolkit-ws';
 import Controller from '../controller/Controller';
 import getThings from '../utils/getThings';
 import sleep from '../utils/sleep';
@@ -10,7 +10,9 @@ import { removeStates } from '../apis/restApi';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
-import { updateDeviceNameAPI } from '../apis/ckApi';
+import { getOTAinfoAPI, updateChannelNameAPI, updateDeviceNameAPI } from '../apis/ckApi';
+import { updateDiyPulseAPI, updateDiySledOnlineAPI, updateDiyStartupAPI, updateDiySwitchAPI } from '../apis/diyDeviceApi';
+import DiyController from '../controller/DiyDeviceController';
 
 const mdns = initMdns();
 
@@ -54,6 +56,29 @@ const getDevices = async (req: Request, res: Response) => {
         res.json({
             error: 0,
             data,
+        });
+    } catch (err) {
+        console.log('Jia ~ file: devices.ts ~ line 22 ~ getDevices ~ err', err);
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+const getDeviceById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.query;
+        const device = Controller.getDevice(id as string);
+        if (!device) {
+            res.json({
+                error: 402,
+                msg: 'device not found',
+            });
+        }
+        res.json({
+            error: 0,
+            data: formatDevice(device!),
         });
     } catch (err) {
         console.log('Jia ~ file: devices.ts ~ line 22 ~ getDevices ~ err', err);
@@ -162,4 +187,171 @@ const updateDeviceName = async (req: Request, res: Response) => {
     }
 };
 
-export { getDevices, disableDevice, updateDeviceName };
+const updateChannelName = async (req: Request, res: Response) => {
+    try {
+        const { tags, id } = req.body;
+        const { error } = await updateChannelNameAPI(id, {
+            ck_channel_name: tags,
+        });
+        if (error === 0) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error: 500,
+                data: null,
+            });
+        }
+    } catch (err) {
+        console.log('Jia ~ file: devices.ts ~ line 71 ~ disableDevice ~ err', err);
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+const proxy2ws = async (req: Request, res: Response) => {
+    try {
+        const { apikey, id, params } = req.body;
+        const result = await CkWs.updateThing({
+            deviceApikey: apikey,
+            deviceid: id,
+            params,
+        });
+        console.log('Jia ~ file: devices.ts ~ line 222 ~ proxy2ws ~ result', result);
+        const { error } = result;
+        if (error === 0) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error,
+                data: null,
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+const getOTAinfo = async (req: Request, res: Response) => {
+    try {
+        const { list } = req.body;
+        console.log('Jia ~ file: devices.ts ~ line 246 ~ getOTAinfo ~ list', list);
+        const { error, data } = await getOTAinfoAPI(list);
+        if (error === 0) {
+            res.json({
+                error: 0,
+                data,
+            });
+        } else {
+            res.json({
+                error: 500,
+                data: null,
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+const upgradeDevice = async (req: Request, res: Response) => {
+    try {
+        const { apikey, id, params } = req.body;
+        const result = await CkWs.upgradeThing({
+            deviceApikey: apikey,
+            deviceid: id,
+            params,
+        });
+        console.log('Jia ~ file: devices.ts ~ line 275 ~ upgradeDevice ~ result', result);
+        const { error } = result;
+        if (error === 0) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error,
+                data: null,
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+const updateDiyDevice = async (req: Request, res: Response) => {
+    try {
+        const { type, id, params } = req.body;
+        const device = Controller.getDevice(id);
+        if (device instanceof DiyController) {
+            let result;
+            if (type === 'switch') {
+                result = await updateDiySwitchAPI({
+                    deviceid: id,
+                    ip: device.ip,
+                    port: device.port,
+                    ...params,
+                });
+            }
+            if (type === 'startup') {
+                result = await updateDiyStartupAPI({
+                    deviceid: id,
+                    ip: device.ip,
+                    port: device.port,
+                    ...params,
+                });
+            }
+            if (type === 'pulse') {
+                result = await updateDiyPulseAPI({
+                    deviceid: id,
+                    ip: device.ip,
+                    port: device.port,
+                    ...params,
+                });
+            }
+            if (type === 'sledOnline') {
+                result = await updateDiySledOnlineAPI({
+                    deviceid: id,
+                    ip: device.ip,
+                    port: device.port,
+                    ...params,
+                });
+            }
+            console.log('Jia ~ file: devices.ts ~ line 320 ~ updateDiyDevice ~ result', result);
+            if (result && result.error === 0) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+            } else {
+                res.json({
+                    error: result.error,
+                    data: null,
+                });
+            }
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+export { getDevices, getDeviceById, disableDevice, updateDeviceName, updateChannelName, proxy2ws, getOTAinfo, upgradeDevice, updateDiyDevice };

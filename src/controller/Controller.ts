@@ -65,7 +65,7 @@ class Controller {
         // DIY
         if (type === 1) {
             const tmp = data as TypeMdnsDiyDevice;
-            if (tmp.a) {
+            if (!tmp.a) {
                 return;
             }
             const diyDevice = new DiyDeviceController({
@@ -83,7 +83,7 @@ class Controller {
             const params = formatLanDevice(data as TypeLanDevice);
             // 如果ip不存在说明该设备可能不支持局域网
             if (!params || !params.ip) {
-                console.log('该设备不支持局域网', params);
+                console.log('该设备不支持局域网', params?.deviceId);
                 return;
             }
             const old = Controller.getDevice(id);
@@ -134,6 +134,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    tags: tmp.tags,
                     disabled,
                 });
                 Controller.deviceMap.set(id, device);

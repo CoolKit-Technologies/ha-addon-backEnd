@@ -13,18 +13,20 @@ import initCkApi from './utils/initCkApi';
 import { appId, appSecret } from './config/app';
 import sleep from './utils/sleep';
 import { debugMode } from './config/config';
-
+import serviceRegistered from './utils/serviceRegistered';
+import generateLovelace from './utils/generateLovelace';
 CkApi.init({
     appId,
     appSecret,
 });
 
 (async () => {
-    initMdns();
-    initHaSocket();
-    initCkWs();
+    initMdns(); // 扫描局域网设备
+    initHaSocket(); // 跟HA建立socket连接
+    await initCkApi(); // 初始化v2接口并保持登录
+    serviceRegistered(); // 注册HA相关服务
     await sleep(3000);
-    initCkApi();
+    await initCkWs(); // 跟易微联Socket建立连接
 })();
 
 const app = express();
@@ -46,7 +48,6 @@ app.use('/', (req: Request, res: Response) => {
     res.type('.html');
     res.sendFile(path.join(__dirname, '/pages/index.html'));
 });
-
 
 app.listen(port, () => {
     console.log(`server is running at ${port}`);

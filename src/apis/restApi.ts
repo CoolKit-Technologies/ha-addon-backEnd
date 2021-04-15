@@ -37,4 +37,27 @@ const removeStates = async (entityId: string) => {
     });
 };
 
-export { getStateByEntityId, updateStates, removeStates };
+const registerService = async (domain: string, service: string) => {
+    return restRequest({
+        method: 'POST',
+        url: `/api/services/${domain}/${service}`,
+        data: {
+            entity_id: 'switch.Ceiling',
+        },
+    }).catch((e) => {
+        console.log('注册服务', domain, ':', service, '出错');
+        console.log('Jia ~ file: restApi.ts ~ line 55 ~ registerService ~ e', e);
+    });
+    // return restRequest({
+    //     method: 'POST',
+    //     url: `/api/events/service_registered`,
+    //     data: {
+    //         domain,
+    //         service,
+    //     },
+    // }).catch((e) => {
+    //     console.log('注册服务', domain, ':', service, '出错');
+    // });
+};
+
+export { getStateByEntityId, updateStates, removeStates, registerService };

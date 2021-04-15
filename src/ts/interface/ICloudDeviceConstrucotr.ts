@@ -19,6 +19,11 @@ interface ICloudDeviceConstrucotr<T = ICloudDeviceParams> {
     };
     params: T;
     disabled?: boolean;
+    tags?: {
+        ck_channel_name: {
+            [key: string]: string;
+        };
+    };
 }
 
 export default ICloudDeviceConstrucotr;

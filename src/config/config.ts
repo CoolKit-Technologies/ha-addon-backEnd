@@ -1,3 +1,3 @@
-const debugMode = true;
+const debugMode = false;
 
 export { debugMode };

@@ -31,6 +31,11 @@ interface ICloudDevice<P = ICloudDeviceParams> {
     online: true;
     params: P;
     denyFeatures: string[];
+    tags?: {
+        ck_channel_name: {
+            [key: string]: string;
+        };
+    };
 }
 
 export default ICloudDevice;

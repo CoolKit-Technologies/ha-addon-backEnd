@@ -24,6 +24,7 @@ class DiyController {
         this.ip = ip;
         this.port = port;
         this.entityId = `switch.${deviceId}`;
+        // this.entityId = `switch.${deviceId}`;
         this.disabled = disabled;
         this.txt = txt;
     }
@@ -53,6 +54,7 @@ DiyController.prototype.updateState = async function (status) {
             restored: true,
             supported_features: 0,
             friendly_name: this.entityId,
+            on: 'homeassistant.turn_on',
             state: status,
         },
     }).catch((e) => {

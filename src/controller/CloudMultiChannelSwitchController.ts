@@ -14,6 +14,7 @@ class CloudMultiChannelSwitchController extends CloudDeviceController {
     params: ICloudMultiChannelSwitchParams;
     extra: ICloudDeviceConstrucotr['extra'];
     maxChannel!: number;
+    channelName?: { [key: string]: string };
     updateSwitch!: (switches: ICloudMultiChannelSwitchParams['switches']) => Promise<void>;
     updateState!: (switches: ICloudMultiChannelSwitchParams['switches']) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ICloudMultiChannelSwitchParams>) {
@@ -26,6 +27,7 @@ class CloudMultiChannelSwitchController extends CloudDeviceController {
         this.extra = params.extra;
         this.disabled = params.disabled!;
         this.uiid = params.extra.uiid;
+        this.channelName = params.tags?.ck_channel_name;
         this.maxChannel = getMaxChannelByUiid(params.extra.uiid);
     }
 }
@@ -51,13 +53,14 @@ CloudMultiChannelSwitchController.prototype.updateState = async function (switch
         return;
     }
     switches.forEach(({ outlet, switch: status }) => {
+        const name = this.channelName ? this.channelName[outlet] : outlet + 1;
         updateStates(`${this.entityId}_${outlet + 1}`, {
             entity_id: `${this.entityId}_${outlet + 1}`,
             state: status,
             attributes: {
                 restored: true,
                 supported_features: 0,
-                friendly_name: `${this.deviceName}-${outlet + 1}`,
+                friendly_name: `${this.deviceName}-${name}`,
                 state: status,
             },
         });

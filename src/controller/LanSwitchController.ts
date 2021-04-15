@@ -2,6 +2,7 @@ import axios from 'axios';
 import { setSwitch } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
+import { ICloudDeviceParams } from '../ts/interface/ICloudDeviceParams';
 import AuthUtils from '../utils/lanControlAuthenticationUtils';
 import LanDeviceController from './LanDeviceController';
 type TypeConstrucotr = {
@@ -25,6 +26,7 @@ class LanSwitchController extends LanDeviceController {
     selfApikey?: string;
     deviceName?: string;
     extra?: ICloudDeviceConstrucotr['extra'];
+    params?: ICloudDeviceParams;
     setSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<any>;
     constructor({ deviceId, ip, port = 8081, disabled, encryptedData, iv }: TypeConstrucotr) {

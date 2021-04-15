@@ -25,7 +25,7 @@ export default async () => {
         for (let i = 0; i < thingList.length; i++) {
             const item = thingList[i];
             if (item.itemType < 3) {
-                const { extra, deviceid, name, params, devicekey, apikey, online } = item.itemData;
+                const { extra, deviceid, name, params, devicekey, apikey, online, tags } = item.itemData;
                 if (!online) {
                     continue;
                 }
@@ -40,6 +40,7 @@ export default async () => {
                     old.selfApikey = apikey;
                     old.deviceName = name;
                     old.extra = extra;
+                    old.params = params;
                     if (old instanceof LanSwitchController) {
                         const decryptData = old.parseEncryptedData() as any;
                         if (decryptData) {
@@ -47,6 +48,7 @@ export default async () => {
                         }
                     }
                     if (old instanceof LanMultiChannelSwitchController) {
+                        old.channelName = tags?.ck_channel_name;
                         old.maxChannel = getMaxChannelByUiid(extra.uiid);
                         const decryptData = old.parseEncryptedData() as any;
                         if (decryptData) {

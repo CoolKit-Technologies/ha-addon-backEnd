@@ -85,7 +85,6 @@ class HaSocket {
             this.client.on(
                 'message',
                 (handler = (res: string) => {
-                    console.log('Jia ~ file: HASocketClass.ts ~ line 86 ~ HaSocket ~ returnnewPromise ~ res', res);
                     try {
                         const data = JSON.parse(res);
                         if (data.id === cur) {
@@ -117,6 +116,14 @@ class HaSocket {
                 type: 'get_config',
             })
         );
+    }
+
+    async getLovelace() {
+        const res = await this.query({
+            type: 'lovelace/config',
+        });
+        console.log('Jia ~ file: HASocketClass.ts ~ line 125 ~ HaSocket ~ getLovelace ~ res', res);
+        return res;
     }
 }
 

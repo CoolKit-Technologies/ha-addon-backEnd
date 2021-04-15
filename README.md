@@ -119,8 +119,73 @@ interface ICloudDevice<P = ICloudDeviceParams> {
 -   业务请求参数:
     | 名称 | 类型 | 允许空 | 说明 |
     | ------- | ------ | :----: | --- |
-    | id | boolean | N | deviceid |
+    | id | string | N | deviceid |
     | disabled | boolean | N | 禁用/启用 |
 
 -   返回值:
     {error:0,msg:"success",data:boolean}
+
+#### 修改设备名称
+
+-   URL: /devices/updateName
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | id | string | N | deviceid |
+    | newName | string | N | 新名字 |
+
+-   返回值:
+    {error:0,data:null}
+
+#### 修改设备子通道名称
+
+-   URL: /devices/updateChannelName
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | id | string | N | deviceid |
+    | tags | Object | N | {[outlet: string]: string} |
+
+-   返回值:
+    {error:0,data:null}
+
+#### 设置设备通电反应/点动状态/网络指示灯/互锁
+
+-   URL: /devices/proxy2ws
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | id | string | N | deviceid |
+    | apikey | string | N | apikey |
+    | params | Object | N |any |
+
+-   返回值:
+    {error:0,data:null}
+
+#### 获取设备更新信息
+
+-   URL: /devices/getOTAinfo
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | list | Array<{ deviceid: string; model: string; version: string; }> | N |deviceid:设备 ID,model:设备的模块型号,version:当前设备的固件版本号 |
+
+-   返回值:
+    {error:0,data:null}
+
+#### 修改 DIY 设备状态/通电反应/点动状态
+
+-   URL: /devices/diy
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | id | string | N | deviceid |
+    | type | string | N | 'switch' or 'startup' or 'pulse' or 'sledOnline' |
+    | params | Object | N | { state: string; width?: number} |
+-   返回值:
+    {error:0,data:null}

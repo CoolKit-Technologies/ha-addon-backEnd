@@ -12,11 +12,11 @@ import CloudRGBLightStripController from '../controller/CloudRGBLightStripContro
 import { IPowerDetectionSwitchSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
 import { getStateByEntityId, updateStates } from '../apis/restApi';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
-
-const at = getDataSync('user.json', ['at']);
 const apikey = getDataSync('user.json', ['user', 'apikey']);
 
+
 export default async () => {
+    const at = getDataSync('user.json', ['at']);
     if (!at || !apikey) {
         return -1;
     }
@@ -26,6 +26,7 @@ export default async () => {
         at,
         apikey,
     });
+    console.log('Jia ~ file: initCkWs.ts ~ line 29 ~ at', at);
 
     coolKitWs.on('message', async (ws) => {
         try {

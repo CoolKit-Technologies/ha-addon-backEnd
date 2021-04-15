@@ -1,4 +1,5 @@
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
+import { ICloudDeviceParams } from '../ts/interface/ICloudDeviceParams';
 import AuthUtils from '../utils/lanControlAuthenticationUtils';
 
 abstract class LanDeviceController {
@@ -14,6 +15,7 @@ abstract class LanDeviceController {
     abstract selfApikey?: string;
     abstract deviceName?: string;
     abstract extra?: ICloudDeviceConstrucotr['extra'];
+    abstract params?: ICloudDeviceParams;
     parseEncryptedData!: () => any;
 }
 

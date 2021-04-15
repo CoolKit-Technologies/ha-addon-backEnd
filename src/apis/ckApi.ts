@@ -20,15 +20,29 @@ const updateDeviceNameAPI = async (deviceid: string, name: string) => {
  *
  * @param {string} deviceid
  * @param {any} tags
- * @description 修个子通道名称
+ * @description 修改子通道名称
  * @return {*}
  */
-const updateChannelNameAPI = async (deviceid: string, tags: { [key: string]: string }) => {
-    return await CkApi.device.updateDeviceTag({
+const updateChannelNameAPI = async (deviceid: string, tags: any) => {
+    const res = await CkApi.device.updateDeviceTag({
         deviceid,
         type: 'merge',
         tags,
     });
+    console.log('Jia ~ file: ckApi.ts ~ line 32 ~ updateChannelNameAPI ~ res', JSON.stringify(res, null, 2));
+    return res;
 };
 
-export { updateDeviceNameAPI, updateChannelNameAPI };
+const getOTAinfoAPI = async (
+    list: {
+        deviceid: string;
+        model: string;
+        version: string;
+    }[]
+) => {
+    return await CkApi.device.getOtaInfo({
+        deviceInfoList: list,
+    });
+};
+
+export { updateDeviceNameAPI, updateChannelNameAPI, getOTAinfoAPI };
