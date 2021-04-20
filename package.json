@@ -12,7 +12,7 @@
     "license": "ISC",
     "dependencies": {
         "color-convert": "^2.0.1",
-        "coolkit-open-api": "^0.2.3",
+        "coolkit-open-api": "^0.3.3",
         "coolkit-ws": "^1.2.0",
         "cors": "^2.8.5",
         "crypto-js": "^4.0.0",

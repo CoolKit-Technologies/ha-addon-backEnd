@@ -8,6 +8,7 @@ export default async () => {
     if (loginParams) {
         const result = await CkApi.user.login(loginParams);
         if (result.error === 0) {
+            console.log('重新登录成功！');
             await saveData('user.json', JSON.stringify({ ...result.data, login: loginParams }));
             await getThings();
             await generateLovelace();

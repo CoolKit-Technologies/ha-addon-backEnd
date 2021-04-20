@@ -189,3 +189,13 @@ interface ICloudDevice<P = ICloudDeviceParams> {
     | params | Object | N | { state: string; width?: number} |
 -   返回值:
     {error:0,data:null}
+
+#### Todo
+
+-   寻找注册相关服务的集成（重要紧急）
+-   Web UI 优化（重要紧急）
+-   支持更多设备配置项（重要不紧急）
+-   支持更多设备（重要不紧急）
+-   映射为设备而非实体（重要不紧急）
+-   自动生成长期访问令牌（重要不紧急）
+-   安装速度优化（紧急不重要）

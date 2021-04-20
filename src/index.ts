@@ -24,8 +24,8 @@ CkApi.init({
     initMdns(); // 扫描局域网设备
     initHaSocket(); // 跟HA建立socket连接
     await initCkApi(); // 初始化v2接口并保持登录
-    serviceRegistered(); // 注册HA相关服务
-    await sleep(3000);
+    // serviceRegistered(); // 注册HA相关服务
+    // await sleep(3000);
     await initCkWs(); // 跟易微联Socket建立连接
 })();
 

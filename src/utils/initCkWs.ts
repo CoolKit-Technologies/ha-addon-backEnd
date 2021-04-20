@@ -14,7 +14,6 @@ import { getStateByEntityId, updateStates } from '../apis/restApi';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 const apikey = getDataSync('user.json', ['user', 'apikey']);
 
-
 export default async () => {
     const at = getDataSync('user.json', ['at']);
     if (!at || !apikey) {
@@ -36,6 +35,8 @@ export default async () => {
                 if (!tmp.deviceid) {
                     return;
                 }
+                console.log('接受到CKWS消息:\n', data);
+
                 const device = Controller.getDevice(tmp.deviceid);
                 if (tmp.action === 'update') {
                     if (device instanceof CloudSwitchController) {

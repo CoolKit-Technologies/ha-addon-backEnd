@@ -1,12 +1,24 @@
 import { getDataSync } from '../utils/dataUtil';
-import { debugMode } from './config';
-let port = 8123;
-if (!debugMode) {
-    port = getDataSync('options.json', ['home_assistant_port']);
-}
-// const HaSocketURL = `http://172.16.9.22:${port}/api/websocket`;
-// const HaRestURL = `http://172.16.9.22:${port}`;
+import { debugMode, isSupervisor } from './config';
+let url = 'http://homeassistant:8123';
 
-const HaSocketURL = `http://homeassistant:${port}/api/websocket`;
-const HaRestURL = `http://homeassistant:${port}`;
+if (!debugMode && isSupervisor) {
+    url = getDataSync('options.json', ['home_assistant_url']);
+}
+
+if (!debugMode && !isSupervisor) {
+    url = process.env.HA_URL!;
+}
+
+if (!url) {
+    throw new Error('You have to set the HA_URL');
+}
+
+// let HaSocketURL = `http://192.168.1.133:8123/api/websocket`;
+// let HaRestURL = `http://192.168.1.133:8123`;
+
+url = url.replace(/\/$/, '');
+let HaSocketURL = `${url}/api/websocket`;
+let HaRestURL = url;
+
 export { HaSocketURL, HaRestURL };

@@ -12,7 +12,7 @@ type TypeCard = {
 
 const generateLovelace = async () => {
     const res = await HASocket.getLovelace();
-    if (Array.isArray(res.views)) {
+    if (res && Array.isArray(res.views)) {
         const { title, views } = res;
         let lovelace = { path: '', title: 'eWeLink Smart Home', badges: [], cards: [] as TypeCard[] };
         const tmp = _.findIndex(views, { title: 'eWeLink Smart Home' });

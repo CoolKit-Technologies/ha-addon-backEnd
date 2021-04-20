@@ -1,7 +1,7 @@
 # ARG BUILD_FROM
 # FROM $BUILD_FROM
 
-FROM node:current-alpine3.13
+FROM node:14-slim
 
 COPY ["./dist", "./package.json", "/workspace/"]
 WORKDIR /workspace

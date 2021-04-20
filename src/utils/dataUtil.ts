@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
-import { debugMode } from '../config/config';
+import { debugMode, isSupervisor } from '../config/config';
 
 let basePath = path.join('/data');
 
-if (debugMode) {
+if (debugMode || !isSupervisor) {
     basePath = path.join(__dirname, '../data');
 }
 
