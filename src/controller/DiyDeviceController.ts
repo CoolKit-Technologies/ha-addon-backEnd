@@ -54,7 +54,6 @@ DiyController.prototype.updateState = async function (status) {
             restored: true,
             supported_features: 0,
             friendly_name: this.entityId,
-            on: 'homeassistant.turn_on',
             state: status,
         },
     }).catch((e) => {
