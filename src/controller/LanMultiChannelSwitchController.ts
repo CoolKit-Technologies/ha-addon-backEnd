@@ -20,6 +20,7 @@ type TypeSwitch = {
 type TypeSwitches = TypeSwitch[];
 
 class LanMultiChannelSwitchController extends LanDeviceController {
+    online: boolean;
     params?: ICloudDeviceParams;
     deviceId: string;
     entityId: string;
@@ -45,6 +46,7 @@ class LanMultiChannelSwitchController extends LanDeviceController {
         this.disabled = disabled;
         this.iv = iv;
         this.encryptedData = encryptedData;
+        this.online = true;
     }
 }
 

@@ -6,14 +6,11 @@ import coolKitWs from 'coolkit-ws';
 import { parseHS2RGB, parseRGB2HS } from '../utils/colorUitl';
 import _ from 'lodash';
 class CloudRGBLightController extends CloudDeviceController {
+    online: boolean;
     disabled: boolean;
     entityId: string;
-    deviceId: string;
-    deviceName: string;
-    apikey: string;
     uiid: number = 22;
     params: ICloudRGBLightParams;
-    extra: ICloudDeviceConstrucotr['extra'];
     colorTemp: number;
     brightness: number;
     hsColor: [number, number];
@@ -46,13 +43,10 @@ class CloudRGBLightController extends CloudDeviceController {
     constructor(params: ICloudDeviceConstrucotr<ICloudRGBLightParams>) {
         super(params);
         const { channel0, channel1, channel2, channel3, channel4, zyx_mode, type } = params.params;
-        this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
-        this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.params = params.params;
-        this.extra = params.extra;
         this.disabled = params.disabled!;
+        this.online = params.online;
         switch (type) {
             case 'cold':
                 this.colorTemp = 1;

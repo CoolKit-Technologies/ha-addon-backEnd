@@ -85,6 +85,35 @@ interface ICloudMultiChannelSwitchParams extends ICloudDeviceParams {
         switch: string;
     }[];
 }
+interface ICloudDualR3Params extends ICloudDeviceParams {
+    configure: {
+        startup: string;
+        outlet: number;
+    }[];
+    pulses: {
+        pulse: string;
+        width: number;
+        outlet: number;
+    }[];
+    switches: {
+        outlet: number;
+        switch: string;
+    }[];
+    workMode: 1 | 2 | 3;
+    current_00: number; // 通道1 的实时电流值
+    voltage_00: number; // 通道1 的实时电压
+    actPow_00: number; // 通道1 的实时有功功率
+    reactPow_00: number; // 通道1 的实时无功功率
+    apparentPow_00: number; // 通道1 的实时视在功率
+    startTime_00: string; // 通道1 的单次电量统计的开始时间
+    endTime_00: string; // 通道1 的单次电量统计的结束时间
+    getKwh_00: number; // 通道1  获取用电量统计，1 获取单次统计用电量， 2 获取历史用电量
+    oneKwhData_00: number; // 通道1 的本次用电量的信息，开通单次统计后，app下发refresh查询，设备返回的
+    kwhHistories_00: string; // 通道1 的历史用电量（180天）
+    zyx_clear_timers: boolean; // 清除服务端所有定时器，true 清除，false不清除
+    uiActive: Object; // 激活UI
+}
+
 interface ICloudRGBLightStripParams extends ICloudDeviceParams {
     sledOnline: string;
     ssid: string;
@@ -110,4 +139,5 @@ export {
     ICloudMultiChannelSwitchParams,
     ICloudRGBLightStripParams,
     IDoubleCloudLightParams,
+    ICloudDualR3Params,
 };

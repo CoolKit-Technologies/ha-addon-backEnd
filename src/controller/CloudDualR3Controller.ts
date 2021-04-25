@@ -1,32 +1,30 @@
 import CloudDeviceController from './CloudDeviceController';
-import { ICloudMultiChannelSwitchParams } from '../ts/interface/ICloudDeviceParams';
+import { ICloudDualR3Params } from '../ts/interface/ICloudDeviceParams';
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
-import { getMaxChannelByUiid } from '../config/channelMap';
-class CloudMultiChannelSwitchController extends CloudDeviceController {
+
+class CloudDualR3Controller extends CloudDeviceController {
+    params: ICloudDualR3Params;
     online: boolean;
     disabled: boolean;
     entityId: string;
     uiid: number;
-    maxChannel!: number;
     channelName?: { [key: string]: string };
-    params: ICloudMultiChannelSwitchParams;
-    updateSwitch!: (switches: ICloudMultiChannelSwitchParams['switches']) => Promise<void>;
-    updateState!: (switches: ICloudMultiChannelSwitchParams['switches']) => Promise<void>;
-    constructor(params: ICloudDeviceConstrucotr<ICloudMultiChannelSwitchParams>) {
+    updateSwitch!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
+    updateState!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
+    constructor(params: ICloudDeviceConstrucotr<ICloudDualR3Params>) {
         super(params);
         this.entityId = `switch.${params.deviceId}`;
+        this.params = params.params;
         this.disabled = params.disabled!;
         this.uiid = params.extra.uiid;
         this.channelName = params.tags?.ck_channel_name;
-        this.maxChannel = getMaxChannelByUiid(params.extra.uiid);
         this.online = params.online;
-        this.params = params.params;
     }
 }
 
-CloudMultiChannelSwitchController.prototype.updateSwitch = async function (switches) {
+CloudDualR3Controller.prototype.updateSwitch = async function (switches) {
     const res = await coolKitWs.updateThing({
         deviceApikey: this.apikey,
         deviceid: this.deviceId,
@@ -42,7 +40,7 @@ CloudMultiChannelSwitchController.prototype.updateSwitch = async function (switc
 /**
  * @description 更新状态到HA
  */
-CloudMultiChannelSwitchController.prototype.updateState = async function (switches) {
+CloudDualR3Controller.prototype.updateState = async function (switches) {
     if (this.disabled) {
         return;
     }
@@ -61,4 +59,4 @@ CloudMultiChannelSwitchController.prototype.updateState = async function (switch
     });
 };
 
-export default CloudMultiChannelSwitchController;
+export default CloudDualR3Controller;

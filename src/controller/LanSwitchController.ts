@@ -15,6 +15,7 @@ type TypeConstrucotr = {
 };
 
 class LanSwitchController extends LanDeviceController {
+    online: boolean;
     deviceId: string;
     entityId: string;
     ip: string;
@@ -38,6 +39,7 @@ class LanSwitchController extends LanDeviceController {
         this.disabled = disabled;
         this.iv = iv;
         this.encryptedData = encryptedData;
+        this.online = true;
     }
 }
 

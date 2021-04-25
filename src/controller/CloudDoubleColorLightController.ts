@@ -6,14 +6,13 @@ import coolKitWs from 'coolkit-ws';
 import _ from 'lodash';
 import { TypeLtypeParams, TypeLtype } from '../ts/type/TypeLtype';
 class CloudDoubleColorLightController extends CloudDeviceController {
+    online: boolean;
     disabled: boolean;
     entityId: string;
-    deviceId: string;
     deviceName: string;
     apikey: string;
     uiid: number = 103;
     params: IDoubleCloudLightParams;
-    extra: ICloudDeviceConstrucotr['extra'];
     ct: number;
     br: number;
     ltype: string;
@@ -23,17 +22,16 @@ class CloudDoubleColorLightController extends CloudDeviceController {
     constructor(params: ICloudDeviceConstrucotr<IDoubleCloudLightParams>) {
         super(params);
         const { ltype } = params.params;
-        this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
         this.deviceName = params.deviceName;
         this.apikey = params.apikey;
-        this.params = params.params;
-        this.extra = params.extra;
         this.disabled = params.disabled!;
         this.ltype = ltype;
         const { br, ct } = params.params[ltype];
         this.br = br;
         this.ct = 255 - ct;
+        this.online = params.online;
+        this.params = params.params;
     }
 }
 

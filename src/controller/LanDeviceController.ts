@@ -16,6 +16,7 @@ abstract class LanDeviceController {
     abstract deviceName?: string;
     abstract extra?: ICloudDeviceConstrucotr['extra'];
     abstract params?: ICloudDeviceParams;
+    abstract online: boolean;
     parseEncryptedData!: () => any;
 }
 

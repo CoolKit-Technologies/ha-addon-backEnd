@@ -22,6 +22,7 @@ export default async () => {
     });
     if (error === 0) {
         const { thingList } = data;
+        console.log('Jia ~ file: getThings.ts ~ line 25 ~ thingList', JSON.stringify(thingList, null, 2));
         for (let i = 0; i < thingList.length; i++) {
             const item = thingList[i];
             if (item.itemType < 3) {

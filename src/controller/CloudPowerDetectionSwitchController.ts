@@ -4,14 +4,11 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
 class CloudPowerDetectionSwitchController extends CloudDeviceController {
+    online: boolean;
     disabled: boolean;
     entityId: string;
-    deviceId: string;
-    deviceName: string;
-    apikey: string;
     uiid: number = 32;
     params: ICloudPowerDetectionSwitchParams;
-    extra: ICloudDeviceConstrucotr['extra'];
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (params: { status: string; power?: string; current?: string; voltage?: string }) => Promise<void>;
     current: string;
@@ -20,17 +17,14 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
     state: string;
     constructor(params: ICloudDeviceConstrucotr<ICloudPowerDetectionSwitchParams>) {
         super(params);
-        this.deviceId = params.deviceId;
         this.entityId = `switch.${params.deviceId}`;
-        this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.params = params.params;
-        this.extra = params.extra;
         this.disabled = params.disabled!;
         this.state = params.params.switch;
         this.current = params.params.current;
         this.voltage = params.params.voltage;
         this.power = params.params.power;
+        this.online = params.online;
 
         // 如果电流电压功率有更新就通知我
         setInterval(() => {

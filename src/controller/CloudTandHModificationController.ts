@@ -4,26 +4,20 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
 class CloudTandHModificationController extends CloudDeviceController {
+    online: boolean;
     disabled: boolean;
-    deviceId: string;
     entityId: string;
-    deviceName: string;
-    apikey: string;
     uiid: number = 15;
     params: ITemperatureAndHumidityModificationParams;
-    extra: ICloudDeviceConstrucotr['extra'];
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<void>;
     updateTandH!: (currentTemperature: string, currentHumidity: string) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ITemperatureAndHumidityModificationParams>) {
         super(params);
-        this.deviceId = params.deviceId;
-        this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.params = params.params;
-        this.extra = params.extra;
         this.entityId = `switch.${params.deviceId}`;
         this.disabled = params.disabled || false;
+        this.online = params.online;
     }
 }
 

@@ -4,16 +4,20 @@ abstract class CloudDeviceController {
     type: number = 4;
     rssi: number;
     apikey: string;
-    abstract deviceName: string;
+    deviceName: string;
+    deviceId: string;
+    extra: ICloudDeviceConstrucotr['extra'];
+    abstract params: ICloudDeviceConstrucotr['params'];
     abstract uiid: number;
-    abstract deviceId: string;
     abstract disabled: boolean;
     abstract entityId: string;
-    abstract extra: ICloudDeviceConstrucotr['extra'];
-    abstract params: ICloudDeviceConstrucotr['params'];
+    abstract online: boolean;
     constructor(data: ICloudDeviceConstrucotr) {
         this.rssi = data.params.rssi;
         this.apikey = data.apikey;
+        this.deviceId = data.deviceId;
+        this.deviceName = data.deviceName;
+        this.extra = data.extra;
     }
 }
 

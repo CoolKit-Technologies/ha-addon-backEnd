@@ -6,15 +6,18 @@ import cors from 'cors';
 import userRouter from './route/user';
 import devicesRouter from './route/devices';
 import languageRouter from './route/language';
+import streamRouter from './route/stream';
 import initMdns from './utils/initMdns';
 import initCkWs from './utils/initCkWs';
 import initHaSocket from './utils/initHaSocket';
 import initCkApi from './utils/initCkApi';
 import { appId, appSecret } from './config/app';
-import sleep from './utils/sleep';
 import { debugMode } from './config/config';
+import sleep from './utils/sleep';
+
 import serviceRegistered from './utils/serviceRegistered';
 import generateLovelace from './utils/generateLovelace';
+
 CkApi.init({
     appId,
     appSecret,
@@ -43,6 +46,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(`${apiPrefix}/user`, userRouter);
 app.use(`${apiPrefix}/devices`, devicesRouter);
 app.use(`${apiPrefix}/language`, languageRouter);
+app.use(`${apiPrefix}/stream`, streamRouter);
 
 app.use('/', (req: Request, res: Response) => {
     res.type('.html');

@@ -87,6 +87,16 @@ interface ICloudDevice<P = ICloudDeviceParams> {
 
 -   返回值:
     {error:0,msg:"success",data: v2 接口返回值}
+#### 登出
+
+-   URL: /logout
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+
+-   返回值:
+    {error:0,msg:"success",data: null}
 
 #### 获取设备列表
 

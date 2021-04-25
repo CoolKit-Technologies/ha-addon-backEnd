@@ -15,6 +15,7 @@ class DiyController {
     ip: string;
     port: number;
     type: number = 1;
+    uiid: number = 1;
     disabled: boolean;
     txt: TypeDiyDevice['txt'];
     setSwitch!: (status: string) => Promise<void>;

@@ -121,6 +121,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, switchDevice);
@@ -135,6 +136,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     tags: tmp.tags,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, device);
@@ -149,6 +151,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, thmDevice);
@@ -163,6 +166,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, rgbLight);
@@ -177,6 +181,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, switchDevice);
@@ -191,6 +196,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, dimming);
@@ -205,6 +211,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    online: tmp.online,
                     disabled,
                 });
                 Controller.deviceMap.set(id, device);
@@ -220,6 +227,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     disabled,
+                    online: tmp.online,
                 });
                 Controller.deviceMap.set(id, device);
                 return device;

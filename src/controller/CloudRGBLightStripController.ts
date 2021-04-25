@@ -7,14 +7,11 @@ import { parseHS2RGB, parseRGB2HS } from '../utils/colorUitl';
 import { IRGBLightStripSocketParams } from '../ts/interface/ICkSocketParams';
 import _ from 'lodash';
 class CloudRGBLightStripController extends CloudDeviceController {
+    online: boolean;
     disabled: boolean;
     entityId: string;
-    deviceId: string;
-    deviceName: string;
-    apikey: string;
     uiid: number = 59;
     params: ICloudRGBLightStripParams;
-    extra: ICloudDeviceConstrucotr['extra'];
     brightness: number;
     mode: number;
     speed: number;
@@ -49,14 +46,10 @@ class CloudRGBLightStripController extends CloudDeviceController {
 
     constructor(params: ICloudDeviceConstrucotr<ICloudRGBLightStripParams>) {
         super(params);
-        this.deviceId = params.deviceId;
         this.entityId = `light.${params.deviceId}`;
-        this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.params = params.params;
-        this.extra = params.extra;
         this.disabled = params.disabled!;
-
+        this.online = params.online;
         this.brightness = this.params.bright * 2.55;
         this.mode = this.params.mode;
         this.speed = this.params.speed;

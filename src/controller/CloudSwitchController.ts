@@ -6,24 +6,18 @@ import coolKitWs from 'coolkit-ws';
 class CloudSwitchController extends CloudDeviceController {
     disabled: boolean;
     entityId: string;
-    deviceId: string;
-    deviceName: string;
-    apikey: string;
     uiid: number = 1;
     params: ICloudSwitchParams;
-    extra: ICloudDeviceConstrucotr['extra'];
+    online: boolean;
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<void>;
     constructor(params: ICloudDeviceConstrucotr<ICloudSwitchParams>) {
         super(params);
-        this.deviceId = params.deviceId;
         this.entityId = `switch.${params.deviceId}`;
-        this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.params = params.params;
-        this.extra = params.extra;
         this.disabled = params.disabled!;
         this.uiid = params.extra.uiid;
+        this.online = params.online;
     }
 }
 

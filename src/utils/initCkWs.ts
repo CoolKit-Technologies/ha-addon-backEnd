@@ -12,6 +12,8 @@ import CloudRGBLightStripController from '../controller/CloudRGBLightStripContro
 import { IPowerDetectionSwitchSocketParams, ITandHModificationSocketParams } from '../ts/interface/ICkSocketParams';
 import { getStateByEntityId, updateStates } from '../apis/restApi';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
+import eventBus from './eventBus';
+
 const apikey = getDataSync('user.json', ['user', 'apikey']);
 
 export default async () => {
@@ -36,7 +38,6 @@ export default async () => {
                     return;
                 }
                 console.log('接受到CKWS消息:\n', data);
-
                 const device = Controller.getDevice(tmp.deviceid);
                 if (tmp.action === 'update') {
                     if (device instanceof CloudSwitchController) {
@@ -83,6 +84,10 @@ export default async () => {
                         console.log('接收到双色灯的信息：', tmp.params);
                         device.updateState(tmp.params);
                     }
+
+                    // 同步状态到前端
+                    eventBus.emit('update-controller', data);
+                    eventBus.emit('ckMsg');
                 }
 
                 if (tmp.action === 'sysmsg' && device?.entityId) {
