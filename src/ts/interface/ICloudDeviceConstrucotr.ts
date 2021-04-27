@@ -5,6 +5,7 @@ interface ICloudDeviceConstrucotr<T = ICloudDeviceParams> {
     deviceName: string;
     apikey: string;
     online: boolean;
+    index: number;
     extra: {
         model: string;
         ui: string;

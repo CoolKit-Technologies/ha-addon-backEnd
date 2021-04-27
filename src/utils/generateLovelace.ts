@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import HASocket from '../class/HASocketClass';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import Controller from '../controller/Controller';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
@@ -21,7 +22,7 @@ const generateLovelace = async () => {
             lovelace = views[tmp];
         }
         for (let device of Controller.deviceMap.values()) {
-            if (device instanceof CloudMultiChannelSwitchController || device instanceof LanMultiChannelSwitchController) {
+            if (device instanceof CloudMultiChannelSwitchController || device instanceof LanMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
                 console.log('Jia ~ file: generateLovelace.ts ~ line 24 ~ generateLovelace ~ device', device);
                 if (!device.maxChannel || device.maxChannel === 1 || !device.deviceName) {
                     continue;

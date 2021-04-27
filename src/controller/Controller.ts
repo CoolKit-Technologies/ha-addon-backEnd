@@ -2,6 +2,7 @@ import ICloudDevice from '../ts/interface/ICloudDevice';
 import _ from 'lodash';
 import {
     ICloudDimmingParams,
+    ICloudDualR3Params,
     ICloudMultiChannelSwitchParams,
     ICloudPowerDetectionSwitchParams,
     ICloudRGBLightParams,
@@ -28,10 +29,14 @@ import LanSwitchController from './LanSwitchController';
 import LanMultiChannelSwitchController from './LanMultiChannelSwitchController';
 import { multiChannelSwitchUiidSet, switchUiidSet } from '../config/uiid';
 import CloudDoubleColorLightController from './CloudDoubleColorLightController';
+import UnsupportDeviceController from './UnsupportDeviceController';
+import CloudDualR3Controller from './CloudDualR3Controller';
+import { device } from 'coolkit-open-api/dist/api';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
-
+    static unsupportDeviceMap: Map<string, UnsupportDeviceController> = new Map();
+    static count: number = 999;
     static getDevice(id: string) {
         if (id) {
             // 删除switch.等前缀
@@ -56,8 +61,9 @@ class Controller {
      * @param {data} 设备数据
      * @memberof Controller
      */
-    static setDevice(params: { id: string; type: number; data: any; lanType?: string }) {
-        const { id, type, data, lanType } = params;
+    static setDevice(params: { id: string; type: number; data: any; lanType?: string; index?: number }) {
+        const { id, type, data, lanType, index } = params;
+        const _index = index || this.count++;
         if (_.isEmpty(id)) {
             return null;
         }
@@ -92,7 +98,6 @@ class Controller {
                 old.encryptedData = params?.encryptedData;
                 return old;
             }
-
             if (lanType === 'plug') {
                 const lanDevice = new LanSwitchController({
                     ...params,
@@ -123,6 +128,7 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, switchDevice);
                 return switchDevice;
@@ -138,6 +144,7 @@ class Controller {
                     tags: tmp.tags,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, device);
                 return device;
@@ -153,6 +160,7 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, thmDevice);
                 return thmDevice;
@@ -168,12 +176,13 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, rgbLight);
                 return rgbLight;
             }
             // 功率检测告警开关
-            if (data.extra.uiid === 32) {
+            if (data.extra.uiid === 32 || data.extra.uiid === 5) {
                 const tmp = data as ICloudDevice<ICloudPowerDetectionSwitchParams>;
                 const switchDevice = new CloudPowerDetectionSwitchController({
                     deviceId: tmp.deviceid,
@@ -183,6 +192,7 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, switchDevice);
                 return switchDevice;
@@ -198,6 +208,7 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, dimming);
                 return dimming;
@@ -213,6 +224,7 @@ class Controller {
                     params: tmp.params,
                     online: tmp.online,
                     disabled,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, device);
                 return device;
@@ -228,9 +240,31 @@ class Controller {
                     params: tmp.params,
                     disabled,
                     online: tmp.online,
+                    index: _index,
                 });
                 Controller.deviceMap.set(id, device);
                 return device;
+            }
+            // DualR3
+            if (data.extra.uiid === 126) {
+                const tmp = data as ICloudDevice<ICloudDualR3Params>;
+                const device = new CloudDualR3Controller({
+                    deviceId: tmp.deviceid,
+                    deviceName: tmp.name,
+                    apikey: tmp.apikey,
+                    extra: tmp.extra,
+                    params: tmp.params,
+                    disabled,
+                    online: tmp.online,
+                    index: _index,
+                });
+                Controller.deviceMap.set(id, device);
+                return device;
+            }
+            // 暂不支持的设备
+            if (!Controller.deviceMap.has(id)) {
+                const unsupportDevice = new UnsupportDeviceController(data);
+                Controller.unsupportDeviceMap.set(id, unsupportDevice);
             }
         }
     }

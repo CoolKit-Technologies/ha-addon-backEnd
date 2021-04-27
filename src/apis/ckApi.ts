@@ -1,4 +1,7 @@
 import CkApi from 'coolkit-open-api';
+import CloudDeviceController from '../controller/CloudDeviceController';
+import Controller from '../controller/Controller';
+import LanDeviceController from '../controller/LanDeviceController';
 
 /**
  *

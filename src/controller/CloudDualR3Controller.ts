@@ -10,6 +10,7 @@ class CloudDualR3Controller extends CloudDeviceController {
     disabled: boolean;
     entityId: string;
     uiid: number;
+    maxChannel: number = 2;
     channelName?: { [key: string]: string };
     updateSwitch!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
     updateState!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
@@ -41,6 +42,7 @@ CloudDualR3Controller.prototype.updateSwitch = async function (switches) {
  * @description 更新状态到HA
  */
 CloudDualR3Controller.prototype.updateState = async function (switches) {
+    console.log('Jia ~ file: CloudDualR3Controller.ts ~ line 44 ~ switches', switches);
     if (this.disabled) {
         return;
     }

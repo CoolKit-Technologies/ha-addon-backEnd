@@ -87,16 +87,24 @@ interface ICloudDevice<P = ICloudDeviceParams> {
 
 -   返回值:
     {error:0,msg:"success",data: v2 接口返回值}
+
 #### 登出
 
 -   URL: /logout
 -   方法: POST
--   业务请求参数:
-    | 名称 | 类型 | 允许空 | 说明 |
-    | ------- | ------ | :----: | --- |
+-   业务请求参数:无
 
 -   返回值:
     {error:0,msg:"success",data: null}
+
+#### 获取登录状态
+
+-   URL: /isLogin
+-   方法: POST
+-   业务请求参数:　无
+
+-   返回值:
+    {error:0,msg:"success",data: {isLogin:boolean}}
 
 #### 获取设备列表
 
@@ -124,7 +132,7 @@ interface ICloudDevice<P = ICloudDeviceParams> {
 
 #### 禁用/启用设备
 
--   URL: /devices/status
+-   URL: /devices/disabled
 -   方法: POST
 -   业务请求参数:
     | 名称 | 类型 | 允许空 | 说明 |
@@ -197,6 +205,18 @@ interface ICloudDevice<P = ICloudDeviceParams> {
     | id | string | N | deviceid |
     | type | string | N | 'switch' or 'startup' or 'pulse' or 'sledOnline' |
     | params | Object | N | { state: string; width?: number} |
+-   返回值:
+    {error:0,data:null}
+
+#### 修改恒温恒湿设备温度单位
+
+-   URL: /devices/device/unit
+-   方法: POST
+-   业务请求参数:
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | id | string | N | deviceid |
+    | unit | string | N | 'c' or 'f' |
 -   返回值:
     {error:0,data:null}
 

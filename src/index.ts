@@ -17,6 +17,7 @@ import sleep from './utils/sleep';
 
 import serviceRegistered from './utils/serviceRegistered';
 import generateLovelace from './utils/generateLovelace';
+import redirectToAuth from './middleware/redirectToAuth';
 
 CkApi.init({
     appId,
@@ -35,14 +36,16 @@ CkApi.init({
 const app = express();
 const port = 3000;
 const apiPrefix = '/api';
-app.use('/', express.static(path.join(__dirname, '/pages')));
 
 if (debugMode) {
     app.use(cors());
 }
+app.use('/', express.static(path.join(__dirname, '/pages')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(redirectToAuth);
+
 app.use(`${apiPrefix}/user`, userRouter);
 app.use(`${apiPrefix}/devices`, devicesRouter);
 app.use(`${apiPrefix}/language`, languageRouter);

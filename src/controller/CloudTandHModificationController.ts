@@ -3,11 +3,13 @@ import { ITemperatureAndHumidityModificationParams } from '../ts/interface/IClou
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
+import { getDataSync } from '../utils/dataUtil';
 class CloudTandHModificationController extends CloudDeviceController {
     online: boolean;
     disabled: boolean;
     entityId: string;
     uiid: number = 15;
+    unit: string;
     params: ITemperatureAndHumidityModificationParams;
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (status: string) => Promise<void>;
@@ -18,6 +20,7 @@ class CloudTandHModificationController extends CloudDeviceController {
         this.entityId = `switch.${params.deviceId}`;
         this.disabled = params.disabled || false;
         this.online = params.online;
+        this.unit = getDataSync('unit', [this.deviceId]) || 'c';
     }
 }
 

@@ -4,4 +4,8 @@ const modifyDeviceStatus = (id: string, status: boolean) => {
     return appendData('disabled.json', [id], status);
 };
 
-export default modifyDeviceStatus;
+const changeDeviceUnit = (id: string, unit: string) => {
+    return appendData('unit.json', [id], unit);
+};
+
+export { modifyDeviceStatus, changeDeviceUnit };

@@ -6,6 +6,8 @@ import DiyController from '../controller/DiyDeviceController';
 import LanDeviceController from '../controller/LanDeviceController';
 import LanSwitchController from '../controller/LanSwitchController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import { appendData, saveData } from './dataUtil';
+import eventBus from './eventBus';
 
 export default () => {
     return Mdns.createInstance({
@@ -24,20 +26,26 @@ export default () => {
             if (device instanceof DiyController) {
                 console.log('found diy device');
                 const diyDevice = formatDiyDevice(device as TypeDiyDevice);
-                !device.disabled && device.updateState(diyDevice.data?.switch!);
+                device.updateState(diyDevice.data?.switch!);
+                // 表示该diy设备在线
+                appendData('diy.json', [diyDevice.id], true);
             }
             if (device instanceof LanSwitchController) {
                 const decryptData = device.parseEncryptedData();
-                if(decryptData) {
+                if (decryptData) {
                     device.updateState(decryptData.switch);
+                    device.params = decryptData;
                 }
             }
             if (device instanceof LanMultiChannelSwitchController) {
                 const decryptData = device.parseEncryptedData();
                 if (decryptData) {
                     device.updateState(decryptData.switches);
+                    device.params = decryptData;
                 }
             }
+            // 触发sse
+            eventBus.emit('sse');
         },
     });
 };

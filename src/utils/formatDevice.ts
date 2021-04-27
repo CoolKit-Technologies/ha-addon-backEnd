@@ -4,6 +4,9 @@ import _ from 'lodash';
 import LanDeviceController from '../controller/LanDeviceController';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import Controller from '../controller/Controller';
+import { getDataSync } from './dataUtil';
+import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 
 const ghostManufacturer = (manufacturer: string = 'eWeLink') => {
     if (~manufacturer.indexOf('松诺') || ~manufacturer.toLocaleUpperCase().indexOf('SONOFF')) {
@@ -12,7 +15,7 @@ const ghostManufacturer = (manufacturer: string = 'eWeLink') => {
     return 'eWeLink';
 };
 
-export default (data: DiyController | CloudDeviceController | LanDeviceController) => {
+const formatDevice = (data: DiyController | CloudDeviceController | LanDeviceController) => {
     if (data instanceof DiyController) {
         return {
             key: data.deviceId,
@@ -47,14 +50,18 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             apikey: data.selfApikey,
             params: data.params,
             online: data.online,
+            index: data.index,
             tags,
         };
     }
 
     if (data instanceof CloudDeviceController) {
-        let tags;
+        let tags, unit;
         if (data instanceof CloudMultiChannelSwitchController) {
             tags = data.channelName;
+        }
+        if (data instanceof CloudTandHModificationController) {
+            unit = data.unit;
         }
         return {
             key: data.deviceId,
@@ -69,7 +76,41 @@ export default (data: DiyController | CloudDeviceController | LanDeviceControlle
             apikey: data.apikey,
             params: data.params,
             online: data.online,
+            index: data.index,
             tags,
+            unit,
         };
     }
 };
+
+const getFormattedDeviceList = () => {
+    const result: any[] = [];
+    for (let item of Controller.deviceMap.values()) {
+        result.push(formatDevice(item));
+    }
+    for (let item of Controller.unsupportDeviceMap.values()) {
+        result.push(item);
+    }
+    const oldDiyDevices = getDataSync('diy.json', []) as { [key: string]: boolean };
+    for (let key in oldDiyDevices) {
+        if (!Controller.getDevice(key)) {
+            result.push({
+                online: false,
+                type: 1,
+                deviceId: key,
+            });
+        }
+    }
+    result.sort((a, b) => {
+        if (!a.index) {
+            return 1;
+        }
+        if (!b.index) {
+            return -1;
+        }
+        return a.index - b.index;
+    });
+    return result;
+};
+
+export { formatDevice, getFormattedDeviceList };

@@ -15,6 +15,7 @@ type TypeConstrucotr = {
 };
 
 class LanSwitchController extends LanDeviceController {
+    index?: number;
     online: boolean;
     deviceId: string;
     entityId: string;

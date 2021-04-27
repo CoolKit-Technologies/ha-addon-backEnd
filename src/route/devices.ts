@@ -1,5 +1,17 @@
 import express from 'express';
-import { getDevices, disableDevice, updateDeviceName, proxy2ws, updateChannelName, getOTAinfo, getDeviceById, upgradeDevice, updateDiyDevice } from '../services/devices';
+import {
+    getDevices,
+    disableDevice,
+    updateDeviceName,
+    proxy2ws,
+    updateChannelName,
+    getOTAinfo,
+    getDeviceById,
+    upgradeDevice,
+    updateDiyDevice,
+    removeDiyDevice,
+    changeUnit,
+} from '../services/devices';
 const router = express.Router();
 
 router.get('/', getDevices);
@@ -19,5 +31,7 @@ router.post('/updateChannelName', updateChannelName);
 router.post('/proxy2ws', proxy2ws);
 router.post('/getOTAinfo', getOTAinfo);
 router.post('/diy', updateDiyDevice);
+router.delete('/diy', removeDiyDevice);
+router.delete('/device/unit', changeUnit);
 
 export default router;

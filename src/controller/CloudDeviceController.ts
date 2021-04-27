@@ -6,6 +6,7 @@ abstract class CloudDeviceController {
     apikey: string;
     deviceName: string;
     deviceId: string;
+    index: number;
     extra: ICloudDeviceConstrucotr['extra'];
     abstract params: ICloudDeviceConstrucotr['params'];
     abstract uiid: number;
@@ -18,6 +19,7 @@ abstract class CloudDeviceController {
         this.deviceId = data.deviceId;
         this.deviceName = data.deviceName;
         this.extra = data.extra;
+        this.index = data.index;
     }
 }
 

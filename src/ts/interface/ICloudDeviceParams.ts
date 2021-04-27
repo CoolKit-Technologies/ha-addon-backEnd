@@ -100,6 +100,13 @@ interface ICloudDualR3Params extends ICloudDeviceParams {
         switch: string;
     }[];
     workMode: 1 | 2 | 3;
+    sledBright: 100;
+    location: 50;
+    currLocation: 50;
+    calibration: 1;
+    calibState: 1;
+    swMode_00: 1;
+    swMode_01: 1;
     current_00: number; // 通道1 的实时电流值
     voltage_00: number; // 通道1 的实时电压
     actPow_00: number; // 通道1 的实时有功功率
@@ -110,6 +117,17 @@ interface ICloudDualR3Params extends ICloudDeviceParams {
     getKwh_00: number; // 通道1  获取用电量统计，1 获取单次统计用电量， 2 获取历史用电量
     oneKwhData_00: number; // 通道1 的本次用电量的信息，开通单次统计后，app下发refresh查询，设备返回的
     kwhHistories_00: string; // 通道1 的历史用电量（180天）
+
+    current_01: number; // 通道2 的实时电流值
+    voltage_01: number; // 通道2 的实时电压
+    actPow_01: number; // 通道2 的实时有功功率
+    reactPow_01: number; // 通道2 的实时无功功率
+    apparentPow_01: number; // 通道2 的实时视在功率
+    startTime_01: string; // 通道2 的单次电量统计的开始时间
+    endTime_01: string; // 通道2 的单次电量统计的结束时间
+    getKwh_01: number; // 通道2  获取用电量统计，1 获取单次统计用电量， 2 获取历史用电量
+    oneKwhData_01: number; // 通道2 的本次用电量的信息，开通单次统计后，app下发refresh查询，设备返回的
+    kwhHistories_01: string; // 通道2 的历史用电量（180天）
     zyx_clear_timers: boolean; // 清除服务端所有定时器，true 清除，false不清除
     uiActive: Object; // 激活UI
 }

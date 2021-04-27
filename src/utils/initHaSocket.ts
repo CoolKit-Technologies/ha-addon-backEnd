@@ -13,6 +13,7 @@ import { TypeHaSocketCallServiceData } from '../ts/type/TypeHaSocketMsg';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 
 /**
  *
@@ -120,6 +121,19 @@ const handleDeviceByEntityId = (entity_id: string, state: string, res: any, muti
             br: brightness_pct,
         });
     }
+    if (device instanceof CloudDualR3Controller) {
+        if (mutiSwitchState) {
+            device.updateSwitch(mutiSwitchState);
+        } else {
+            const [id, outlet] = entity_id.split('_');
+            device.updateSwitch([
+                {
+                    outlet: +outlet - 1,
+                    switch: state,
+                },
+            ]);
+        }
+    }
 };
 
 export default async () => {
@@ -150,7 +164,7 @@ export default async () => {
                         const [deviceid, outlet] = item.split('_');
                         const device = Controller.getDevice(deviceid);
                         // 一次性控制多通道设备多个通道
-                        if (device instanceof LanMultiChannelSwitchController || device instanceof CloudMultiChannelSwitchController) {
+                        if (device instanceof LanMultiChannelSwitchController || device instanceof CloudMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
                             if (tmpMap.has(deviceid)) {
                                 tmpMap.get(deviceid)!.push({
                                     outlet: outlet - 1,
@@ -178,27 +192,6 @@ export default async () => {
                     handleDeviceByEntityId(entity_id, state, res);
                 }
             });
-
-            HASocket.subscribeEvents('state_changed');
-            // todo
-            // HASocket.handleEvent('state_changed', (res: TypeHaSocketStateChangedData) => {
-            //     try {
-            //         const { entity_id, new_state } = res;
-            //         console.log('Jia ~ file: initHaSocket.ts ~ line 33 ~ HASocket.handleEvent ~ new_state', new_state);
-            //         if (entity_id) {
-            //             const data = Controller.getDevice(entity_id);
-            //             if (data && data.type === 1) {
-            //                 (data as DiyDeviceController).updateState(new_state.state);
-            //                 // (data as DiyDeviceController).setSwitch(new_state.state);
-            //             }
-            //             if (data && data.type === 4) {
-            //                 (data as CloudSwitchController).updateSwitch(new_state.state);
-            //             }
-            //         }
-            //     } catch (error) {
-            //         console.log('Jia ~ file: initHaSocket.ts ~ line 45 ~ HASocket.handleEvent ~ error', error);
-            //     }
-            // });
         }
     } catch (err) {
         console.log('Jia ~ file: initHaSocket.ts ~ line 28 ~ err', err);

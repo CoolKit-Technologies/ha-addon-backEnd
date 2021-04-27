@@ -6,6 +6,9 @@ import Controller from '../controller/Controller';
 import coolKitWs from 'coolkit-ws';
 import { appId, appSecret } from '../config/app';
 import _ from 'lodash';
+import eventBus from '../utils/eventBus';
+import LanDeviceController from '../controller/LanDeviceController';
+import CloudDeviceController from '../controller/CloudDeviceController';
 
 /**
  * @param {string} lang
@@ -36,6 +39,7 @@ const login = async (req: Request, res: Response) => {
                 apikey,
             });
             await getThings();
+            eventBus.emit('sse');
         }
         res.json(result);
     } catch (err) {
@@ -48,12 +52,47 @@ const logout = async (req: Request, res: Response) => {
         const result = await clearData('user.json');
         console.log('Jia ~ file: user.ts ~ line 37 ~ logout ~ result', result);
         clearData('disabled.json');
-        Controller.deviceMap.clear();
+        for (let [id, device] of Controller.deviceMap.entries()) {
+            if (device instanceof LanDeviceController) {
+                device.selfApikey = undefined;
+                device.devicekey = undefined;
+                device.deviceName = undefined;
+                device.extra = undefined;
+                device.params = undefined;
+            }
+            if (device instanceof CloudDeviceController) {
+                Controller.deviceMap.delete(id);
+            }
+        }
         const ckRes = await CkApi.user.logout();
         console.log('Jia ~ file: user.ts ~ line 41 ~ logout ~ ckRes', ckRes);
         res.json({
             error: 0,
             data: null,
+        });
+        eventBus.emit('sse');
+    } catch (err) {
+        console.log(err);
+        res.json({
+            error: 500,
+            data: err,
+        });
+    }
+};
+
+const isLogin = async (req: Request, res: Response) => {
+    try {
+        const result = await getDataSync('user.json');
+        if (result && result.at) {
+            res.json({
+                error: 0,
+                data: { isLogin: true },
+            });
+            return;
+        }
+        res.json({
+            error: 0,
+            data: { isLogin: false },
         });
     } catch (err) {
         console.log(err);
@@ -63,4 +102,5 @@ const logout = async (req: Request, res: Response) => {
         });
     }
 };
-export { login, logout };
+
+export { login, logout, isLogin };

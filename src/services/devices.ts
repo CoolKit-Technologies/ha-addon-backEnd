@@ -4,8 +4,8 @@ import Controller from '../controller/Controller';
 import getThings from '../utils/getThings';
 import sleep from '../utils/sleep';
 import initMdns from '../utils/initMdns';
-import modifyDeviceStatus from '../utils/modifyDeviceStatus';
-import formatDevice from '../utils/formatDevice';
+import { modifyDeviceStatus, changeDeviceUnit } from '../utils/modifyDeviceStatus';
+import { getFormattedDeviceList, formatDevice } from '../utils/formatDevice';
 import { removeStates } from '../apis/restApi';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
@@ -13,6 +13,12 @@ import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitch
 import { getOTAinfoAPI, updateChannelNameAPI, updateDeviceNameAPI } from '../apis/ckApi';
 import { updateDiyPulseAPI, updateDiySledOnlineAPI, updateDiyStartupAPI, updateDiySwitchAPI } from '../apis/diyDeviceApi';
 import DiyController from '../controller/DiyDeviceController';
+import { appendData, getDataSync, saveData } from '../utils/dataUtil';
+import _ from 'lodash';
+import eventBus from '../utils/eventBus';
+import LanDeviceController from '../controller/LanDeviceController';
+import CloudDeviceController from '../controller/CloudDeviceController';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 
 const mdns = initMdns();
 
@@ -40,19 +46,34 @@ const getDevices = async (req: Request, res: Response) => {
             await sleep(1000);
         }
 
-        const [cloud, lan, diy] = (+type!).toString(2).padStart(3, '0').split('');
-        const data: any[] = [];
-        for (let item of Controller.deviceMap.values()) {
-            if (item.type === 1 && +diy) {
-                data.push(formatDevice(item));
-            }
-            if (item.type === 2 && +lan) {
-                data.push(formatDevice(item));
-            }
-            if (item.type === 4 && +cloud) {
-                data.push(formatDevice(item));
-            }
-        }
+        // const [cloud, lan, diy] = (+type!).toString(2).padStart(3, '0').split('');
+        // const data: any[] = [];
+        // for (let item of Controller.deviceMap.values()) {
+        //     if (item.type === 1 && +diy) {
+        //         data.push(formatDevice(item));
+        //     }
+        //     if (item.type === 2 && +lan) {
+        //         data.push(formatDevice(item));
+        //     }
+        //     if (item.type === 4 && +cloud) {
+        //         data.push(formatDevice(item));
+        //     }
+        // }
+        // for (let item of Controller.unsupportDeviceMap.values()) {
+        //     data.push(item);
+        // }
+        // const oldDiyDevices = getDataSync('diy.json', []) as { [key: string]: boolean };
+        // for (let key in oldDiyDevices) {
+        //     if (!Controller.getDevice(key)) {
+        //         data.push({
+        //             online: false,
+        //             type: 1,
+        //             deviceId: key,
+        //         });
+        //     }
+        // }
+        const data = getFormattedDeviceList();
+
         res.json({
             error: 0,
             data,
@@ -159,25 +180,29 @@ const updateDeviceName = async (req: Request, res: Response) => {
     try {
         const { newName, id } = req.body;
         const device = Controller.getDevice(id);
-        if (!device) {
+        if (device instanceof CloudDeviceController || device instanceof LanDeviceController) {
+            const { error } = await updateDeviceNameAPI(id, newName);
+            if (error === 0) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+                device.deviceName = newName;
+                eventBus.emit('sse');
+            } else {
+                console.log('更新设备名称出错, id:', id, '\nerror:', error);
+
+                res.json({
+                    error,
+                    data: null,
+                });
+            }
+        } else {
             res.json({
                 error: 402,
                 msg: 'not such device',
             });
         }
-        const { error } = await updateDeviceNameAPI(id, newName);
-        if (error === 0) {
-            res.json({
-                error: 0,
-                data: null,
-            });
-        } else {
-            res.json({
-                error: 500,
-                data: null,
-            });
-        }
-        await getThings();
     } catch (err) {
         console.log('Jia ~ file: devices.ts ~ line 71 ~ disableDevice ~ err', err);
         res.json({
@@ -190,20 +215,35 @@ const updateDeviceName = async (req: Request, res: Response) => {
 const updateChannelName = async (req: Request, res: Response) => {
     try {
         const { tags, id } = req.body;
-        const { error } = await updateChannelNameAPI(id, {
-            ck_channel_name: tags,
-        });
-        if (error === 0) {
-            res.json({
-                error: 0,
-                data: null,
+        let ck_channel_name = tags;
+        const device = Controller.getDevice(id);
+        if (device instanceof LanMultiChannelSwitchController || device instanceof CloudMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
+            ck_channel_name = {
+                ...device.channelName,
+                ...ck_channel_name,
+            };
+            const { error } = await updateChannelNameAPI(id, {
+                ck_channel_name,
             });
-        } else {
-            res.json({
-                error: 500,
-                data: null,
-            });
+            if (error === 0) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+                device.channelName = ck_channel_name;
+                eventBus.emit('sse');
+                return;
+            } else {
+                res.json({
+                    error,
+                    data: null,
+                });
+            }
         }
+        res.json({
+            error: 500,
+            data: null,
+        });
     } catch (err) {
         console.log('Jia ~ file: devices.ts ~ line 71 ~ disableDevice ~ err', err);
         res.json({
@@ -228,6 +268,20 @@ const proxy2ws = async (req: Request, res: Response) => {
                 error: 0,
                 data: null,
             });
+
+            const device = Controller.getDevice(id);
+            if (device instanceof CloudDeviceController) {
+                device.params = _.mergeWith(device.params, params, (objVal, srcVal) => {
+                    if (Array.isArray(objVal) && Array.isArray(srcVal)) {
+                        for (let item of srcVal) {
+                            objVal[item.outlet] = item;
+                        }
+                        return objVal;
+                    }
+                });
+                device.online = true;
+            }
+            eventBus.emit('sse');
         } else {
             res.json({
                 error,
@@ -254,7 +308,7 @@ const getOTAinfo = async (req: Request, res: Response) => {
             });
         } else {
             res.json({
-                error: 500,
+                error,
                 data: null,
             });
         }
@@ -354,4 +408,58 @@ const updateDiyDevice = async (req: Request, res: Response) => {
     }
 };
 
-export { getDevices, getDeviceById, disableDevice, updateDeviceName, updateChannelName, proxy2ws, getOTAinfo, upgradeDevice, updateDiyDevice };
+const removeDiyDevice = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.body;
+        const diyDevices = getDataSync('diy.json', []);
+        const code = saveData('diy.json', JSON.stringify(_.omit(diyDevices, [id])));
+        if (code) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error: 500,
+                data: null,
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+// 更改恒温恒湿设备的温度单位
+const changeUnit = async (req: Request, res: Response) => {
+    try {
+        const { id, unit } = req.body;
+        const device = Controller.getDevice(id);
+        if (device instanceof CloudTandHModificationController) {
+            const code = await appendData('unit.json', [id], unit);
+            if (code) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+                device.unit = unit;
+            }
+            eventBus.emit('sse');
+        } else {
+            res.json({
+                error: 402,
+                data: null,
+                msg: 'not such device',
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+export { getDevices, getDeviceById, disableDevice, updateDeviceName, updateChannelName, proxy2ws, getOTAinfo, upgradeDevice, updateDiyDevice, removeDiyDevice, changeUnit };

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import HASocket from '../class/HASocketClass';
 import Controller from '../controller/Controller';
 import eventBus from '../utils/eventBus';
-import formatDevice from '../utils/formatDevice';
+import { getFormattedDeviceList } from '../utils/formatDevice';
 
 const sse = async (req: Request, res: Response) => {
     res.header({
@@ -15,12 +15,9 @@ const sse = async (req: Request, res: Response) => {
 
     res.write('retry: 10000\n');
 
-    eventBus.on('ckMsg', () => {
-        console.log('Jia ~ file: sse.ts ~ line 19 ~ eventBus.on ~ ckMsg');
-        const result: any[] = [];
-        for (let item of Controller.deviceMap.values()) {
-            result.push(formatDevice(item));
-        }
+    eventBus.on('sse', () => {
+        const result = getFormattedDeviceList();
+
         res.write('data: ' + JSON.stringify(result) + '\n\n');
     });
 

@@ -7,7 +7,7 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
     online: boolean;
     disabled: boolean;
     entityId: string;
-    uiid: number = 32;
+    uiid: number;
     params: ICloudPowerDetectionSwitchParams;
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (params: { status: string; power?: string; current?: string; voltage?: string }) => Promise<void>;
@@ -23,17 +23,18 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
         this.state = params.params.switch;
         this.current = params.params.current;
         this.voltage = params.params.voltage;
+        this.uiid = params.extra.uiid;
         this.power = params.params.power;
         this.online = params.online;
 
-        // 如果电流电压功率有更新就通知我
-        setInterval(() => {
-            coolKitWs.updateThing({
-                deviceApikey: this.apikey,
-                deviceid: this.deviceId,
-                params: { uiActive: 120 },
-            });
-        }, 120000);
+        // // 如果电流电压功率有更新就通知我
+        // setInterval(() => {
+        //     coolKitWs.updateThing({
+        //         deviceApikey: this.apikey,
+        //         deviceid: this.deviceId,
+        //         params: { uiActive: 120 },
+        //     });
+        // }, 120000);
     }
 }
 

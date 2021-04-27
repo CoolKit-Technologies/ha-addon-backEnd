@@ -13,6 +13,7 @@ import { IPowerDetectionSwitchSocketParams, ITandHModificationSocketParams } fro
 import { getStateByEntityId, updateStates } from '../apis/restApi';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import eventBus from './eventBus';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 
 const apikey = getDataSync('user.json', ['user', 'apikey']);
 
@@ -64,6 +65,7 @@ export default async () => {
                     }
                     if (device instanceof CloudPowerDetectionSwitchController) {
                         const { current, voltage, power, switch: status } = tmp.params as IPowerDetectionSwitchSocketParams;
+                        console.log('接收到功率检查插座的消息', tmp.params);
                         device.updateState({
                             status,
                             current,
@@ -84,16 +86,22 @@ export default async () => {
                         console.log('接收到双色灯的信息：', tmp.params);
                         device.updateState(tmp.params);
                     }
+                    if (device instanceof CloudDualR3Controller) {
+                        console.log('接收到DualR3的信息：', tmp.params);
+                        if (tmp.params && tmp.params.switches) {
+                            device.updateState(tmp.params.switches);
+                        }
+                    }
 
                     // 同步状态到前端
                     eventBus.emit('update-controller', data);
-                    eventBus.emit('ckMsg');
+                    eventBus.emit('sse');
                 }
 
                 if (tmp.action === 'sysmsg' && device?.entityId) {
                     const { online } = tmp.params;
                     // 设备下线通知同步到HA
-                    if (!online) {
+                    if (online === false) {
                         const res = await getStateByEntityId(device.entityId);
                         if (res && res.data) {
                             updateStates(device.entityId, {
@@ -105,6 +113,9 @@ export default async () => {
                                 },
                             });
                         }
+                        // 同步状态到前端
+                        eventBus.emit('device-offline', device.deviceId);
+                        eventBus.emit('sse');
                     }
                 }
             }

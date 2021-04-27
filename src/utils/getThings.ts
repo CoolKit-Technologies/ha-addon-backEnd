@@ -13,6 +13,7 @@ import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitch
 import { getMaxChannelByUiid } from '../config/channelMap';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import LanSwitchController from '../controller/LanSwitchController';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -25,11 +26,9 @@ export default async () => {
         console.log('Jia ~ file: getThings.ts ~ line 25 ~ thingList', JSON.stringify(thingList, null, 2));
         for (let i = 0; i < thingList.length; i++) {
             const item = thingList[i];
+            const deviceIndex = item.index;
             if (item.itemType < 3) {
-                const { extra, deviceid, name, params, devicekey, apikey, online, tags } = item.itemData;
-                if (!online) {
-                    continue;
-                }
+                const { extra, deviceid, name, params, devicekey, apikey, tags } = item.itemData;
                 const old = Controller.getDevice(deviceid!);
                 if (old instanceof DiyController) {
                     // 如果设备已经存在并且是DIY设备就不做任何操作
@@ -42,6 +41,7 @@ export default async () => {
                     old.deviceName = name;
                     old.extra = extra;
                     old.params = params;
+                    old.index = deviceIndex;
                     if (old instanceof LanSwitchController) {
                         const decryptData = old.parseEncryptedData() as any;
                         if (decryptData) {
@@ -64,6 +64,7 @@ export default async () => {
                     id: deviceid!,
                     type: 4,
                     data: item.itemData,
+                    index: deviceIndex,
                 });
 
                 if (device instanceof CloudSwitchController) {
@@ -102,6 +103,10 @@ export default async () => {
                 }
                 if (device instanceof CloudDoubleColorLightController) {
                     !device.disabled && device.updateState(params);
+                }
+                if (device instanceof CloudDualR3Controller) {
+                    console.log('Jia ~ file: getThings.ts ~ CloudDualR3Controller ~ params', params);
+                    !device.disabled && device.updateState(params.switches);
                 }
             }
         }
