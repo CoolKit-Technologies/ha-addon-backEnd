@@ -14,12 +14,13 @@ import { getMaxChannelByUiid } from '../config/channelMap';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import LanSwitchController from '../controller/LanSwitchController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
+import { getDataSync } from './dataUtil';
 
 // 获取设备并同步到HA
 export default async () => {
+    const lang = getDataSync('user.json', ['region']) === 'cn' ? 'cn' : 'en';
     const { error, data } = await CkApi.device.getThingList({
-        // todo
-        lang: 'cn',
+        lang,
     });
     if (error === 0) {
         const { thingList } = data;
