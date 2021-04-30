@@ -84,6 +84,8 @@ interface ICloudMultiChannelSwitchParams extends ICloudDeviceParams {
         outlet: number;
         switch: string;
     }[];
+    sledOnline: string;
+    zyx_clear_timers: boolean;
 }
 interface ICloudDualR3Params extends ICloudDeviceParams {
     configure: {

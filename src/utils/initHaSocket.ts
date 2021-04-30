@@ -14,6 +14,7 @@ import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitch
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
+import eventBus from './eventBus';
 
 /**
  *
@@ -24,25 +25,25 @@ import CloudDualR3Controller from '../controller/CloudDualR3Controller';
  * @param {{ outlet: number; switch: string }[]} [mutiSwitchState] 可选，控制多通道的全开/全关
  * @return {*}
  */
-const handleDeviceByEntityId = (entity_id: string, state: string, res: any, mutiSwitchState?: { outlet: number; switch: string }[]) => {
+const handleDeviceByEntityId = async (entity_id: string, state: string, res: any, mutiSwitchState?: { outlet: number; switch: string }[]) => {
     const device = Controller.getDevice(entity_id.replace(/_\d+$/, ''));
     // DIY
     if (device instanceof DiyDeviceController) {
-        device.setSwitch(state);
+        await device.setSwitch(state);
     }
 
     // LAN
     if (device instanceof LanSwitchController) {
-        device.setSwitch(state);
+        await device.setSwitch(state);
     }
 
     // LAN
     if (device instanceof LanMultiChannelSwitchController) {
         if (mutiSwitchState) {
-            device.setSwitch(mutiSwitchState);
+            await device.setSwitch(mutiSwitchState);
         } else {
             const [id, outlet] = entity_id.split('_');
-            device.setSwitch([
+            await device.setSwitch([
                 {
                     outlet: +outlet - 1,
                     switch: state,
@@ -53,40 +54,40 @@ const handleDeviceByEntityId = (entity_id: string, state: string, res: any, muti
 
     // Cloud
     if (device instanceof CloudSwitchController) {
-        device.updateSwitch(state);
+        await device.updateSwitch(state);
     }
     if (device instanceof CloudRGBLightController) {
         if (state === 'off') {
-            device.updateLight({
+            await device.updateLight({
                 state,
             });
             return;
         }
         const { hs_color, brightness_pct = 0 } = res.service_data;
         const params = device.parseHaData2Ck({ hs_color, brightness_pct, state });
-        device.updateLight(params);
+        await device.updateLight(params);
     }
     if (device instanceof CloudDimmingController) {
         const { brightness_pct } = res.service_data;
-        device.updateLight({
+        await device.updateLight({
             switch: state,
             bright: brightness_pct,
         });
     }
     if (device instanceof CloudPowerDetectionSwitchController) {
-        device.updateSwitch(state);
+        await device.updateSwitch(state);
     }
 
     if (device instanceof CloudTandHModificationController) {
-        device.updateSwitch(state);
+        await device.updateSwitch(state);
     }
 
     if (device instanceof CloudMultiChannelSwitchController) {
         if (mutiSwitchState) {
-            device.updateSwitch(mutiSwitchState);
+            await device.updateSwitch(mutiSwitchState);
         } else {
             const [id, outlet] = entity_id.split('_');
-            device.updateSwitch([
+            await device.updateSwitch([
                 {
                     outlet: +outlet - 1,
                     switch: state,
@@ -97,25 +98,25 @@ const handleDeviceByEntityId = (entity_id: string, state: string, res: any, muti
 
     if (device instanceof CloudRGBLightStripController) {
         if (state === 'off') {
-            device.updateLight({
+            await device.updateLight({
                 switch: state,
             });
             return;
         }
         const { hs_color, color_temp, brightness_pct = 0 } = res.service_data;
         const params = device.parseHaData2Ck({ hs_color, brightness_pct, state });
-        device.updateLight(params);
+        await device.updateLight(params);
     }
 
     if (device instanceof CloudDoubleColorLightController) {
         if (state === 'off') {
-            device.updateLight({
+            await device.updateLight({
                 switch: state,
             });
             return;
         }
         const { color_temp, brightness_pct } = res.service_data;
-        device.updateLight({
+        await device.updateLight({
             switch: state,
             ct: color_temp,
             br: brightness_pct,
@@ -123,10 +124,10 @@ const handleDeviceByEntityId = (entity_id: string, state: string, res: any, muti
     }
     if (device instanceof CloudDualR3Controller) {
         if (mutiSwitchState) {
-            device.updateSwitch(mutiSwitchState);
+            await device.updateSwitch(mutiSwitchState);
         } else {
             const [id, outlet] = entity_id.split('_');
-            device.updateSwitch([
+            await device.updateSwitch([
                 {
                     outlet: +outlet - 1,
                     switch: state,
@@ -141,7 +142,7 @@ export default async () => {
         const res = await HASocket.init();
         if (res === 0) {
             HASocket.subscribeEvents('call_service');
-            HASocket.handleEvent('call_service', (res: TypeHaSocketCallServiceData) => {
+            HASocket.handleEvent('call_service', async (res: TypeHaSocketCallServiceData) => {
                 console.log('HA触发call_service事件', res);
 
                 const {
@@ -184,13 +185,14 @@ export default async () => {
                     });
 
                     for (let [id, mutiSwitchState] of tmpMap.entries()) {
-                        handleDeviceByEntityId(id, state, res, mutiSwitchState);
+                        await handleDeviceByEntityId(id, state, res, mutiSwitchState);
                     }
                 }
 
                 if (typeof entity_id === 'string') {
-                    handleDeviceByEntityId(entity_id, state, res);
+                    await handleDeviceByEntityId(entity_id, state, res);
                 }
+                eventBus.emit('sse');
             });
         }
     } catch (err) {

@@ -18,6 +18,8 @@ import sleep from './utils/sleep';
 import serviceRegistered from './utils/serviceRegistered';
 import generateLovelace from './utils/generateLovelace';
 import redirectToAuth from './middleware/redirectToAuth';
+import AuthClass from './class/AuthClass';
+import eventBus from './utils/eventBus';
 
 CkApi.init({
     appId,
@@ -26,11 +28,16 @@ CkApi.init({
 
 (async () => {
     initMdns(); // 扫描局域网设备
-    initHaSocket(); // 跟HA建立socket连接
+    // todo
+    // await AuthClass.init();
+    // if (AuthClass.curAuth) {
+    //     eventBus.emit('init-ha-socket');
+    // }
+    await initHaSocket(); // 跟HA建立socket连接
+    await initCkWs(); // 跟易微联Socket建立连接
     await initCkApi(); // 初始化v2接口并保持登录
     // serviceRegistered(); // 注册HA相关服务
     // await sleep(3000);
-    await initCkWs(); // 跟易微联Socket建立连接
 })();
 
 const app = express();
@@ -40,13 +47,15 @@ const apiPrefix = '/api';
 if (debugMode) {
     app.use(cors());
 }
-app.use('/', express.static(path.join(__dirname, '/pages')));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(redirectToAuth);
 
 app.use(`${apiPrefix}/user`, userRouter);
+
+// app.use(redirectToAuth);
+app.use('/', express.static(path.join(__dirname, '/pages')));
+
 app.use(`${apiPrefix}/devices`, devicesRouter);
 app.use(`${apiPrefix}/language`, languageRouter);
 app.use(`${apiPrefix}/stream`, streamRouter);

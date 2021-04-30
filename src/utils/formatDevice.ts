@@ -7,6 +7,8 @@ import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitch
 import Controller from '../controller/Controller';
 import { getDataSync } from './dataUtil';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 
 const ghostManufacturer = (manufacturer: string = 'eWeLink') => {
     if (~manufacturer.indexOf('松诺') || ~manufacturer.toLocaleUpperCase().indexOf('SONOFF')) {
@@ -56,12 +58,15 @@ const formatDevice = (data: DiyController | CloudDeviceController | LanDeviceCon
     }
 
     if (data instanceof CloudDeviceController) {
-        let tags, unit;
+        let tags, unit, rate;
         if (data instanceof CloudMultiChannelSwitchController) {
             tags = data.channelName;
         }
         if (data instanceof CloudTandHModificationController) {
             unit = data.unit;
+        }
+        if (data instanceof CloudPowerDetectionSwitchController || data instanceof CloudDualR3Controller) {
+            rate = data.rate;
         }
         return {
             key: data.deviceId,
@@ -79,6 +84,7 @@ const formatDevice = (data: DiyController | CloudDeviceController | LanDeviceCon
             index: data.index,
             tags,
             unit,
+            rate,
         };
     }
 };

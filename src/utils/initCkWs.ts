@@ -33,12 +33,13 @@ export default async () => {
     coolKitWs.on('message', async (ws) => {
         try {
             const { type, data } = ws;
+            console.log('接受到CKWS消息:type-->', data);
+            console.log('接受到CKWS消息:\n', data);
             if (type === 'message' && data !== 'pong') {
                 const tmp = JSON.parse(data);
                 if (!tmp.deviceid) {
                     return;
                 }
-                console.log('接受到CKWS消息:\n', data);
                 const device = Controller.getDevice(tmp.deviceid);
                 if (tmp.action === 'update') {
                     if (device instanceof CloudSwitchController) {
@@ -65,7 +66,7 @@ export default async () => {
                     }
                     if (device instanceof CloudPowerDetectionSwitchController) {
                         const { current, voltage, power, switch: status } = tmp.params as IPowerDetectionSwitchSocketParams;
-                        console.log('接收到功率检查插座的消息', tmp.params);
+                        console.log('接收到功率检查插座的消息->params:', tmp.params);
                         device.updateState({
                             status,
                             current,

@@ -7,5 +7,8 @@ const modifyDeviceStatus = (id: string, status: boolean) => {
 const changeDeviceUnit = (id: string, unit: string) => {
     return appendData('unit.json', [id], unit);
 };
+const setDeviceRate = (id: string, rate: string) => {
+    return appendData('rate.json', [id], rate);
+};
 
-export { modifyDeviceStatus, changeDeviceUnit };
+export { modifyDeviceStatus, changeDeviceUnit, setDeviceRate };

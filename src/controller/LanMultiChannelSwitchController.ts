@@ -2,8 +2,7 @@ import axios from 'axios';
 import { setSwitches } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
-import { ICloudDeviceParams } from '../ts/interface/ICloudDeviceParams';
-import AuthUtils from '../utils/lanControlAuthenticationUtils';
+import { ICloudMultiChannelSwitchParams } from '../ts/interface/ICloudDeviceParams';
 import LanDeviceController from './LanDeviceController';
 type TypeConstrucotr = {
     deviceId: string;
@@ -22,7 +21,7 @@ type TypeSwitches = TypeSwitch[];
 class LanMultiChannelSwitchController extends LanDeviceController {
     index?: number;
     online: boolean;
-    params?: ICloudDeviceParams;
+    params?: ICloudMultiChannelSwitchParams;
     deviceId: string;
     entityId: string;
     ip: string;

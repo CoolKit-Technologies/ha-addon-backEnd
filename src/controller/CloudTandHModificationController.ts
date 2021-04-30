@@ -20,7 +20,7 @@ class CloudTandHModificationController extends CloudDeviceController {
         this.entityId = `switch.${params.deviceId}`;
         this.disabled = params.disabled || false;
         this.online = params.online;
-        this.unit = getDataSync('unit', [this.deviceId]) || 'c';
+        this.unit = getDataSync('unit.json', [this.deviceId]) || 'c';
     }
 }
 
@@ -34,6 +34,7 @@ CloudTandHModificationController.prototype.updateSwitch = async function (status
     });
     if (res.error === 0) {
         this.updateState(status);
+        this.params.switch = status;
     }
 };
 

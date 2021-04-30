@@ -2,8 +2,12 @@ import _ from 'lodash';
 import HASocket from '../class/HASocketClass';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import CloudSwitchController from '../controller/CloudSwitchController';
 import Controller from '../controller/Controller';
+import DiyController from '../controller/DiyDeviceController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import LanSwitchController from '../controller/LanSwitchController';
 type TypeCard = {
     type: string;
     entities: string[];
@@ -16,12 +20,45 @@ const generateLovelace = async () => {
     if (res && Array.isArray(res.views)) {
         const { title, views } = res;
         let lovelace = { path: '', title: 'eWeLink Smart Home', badges: [], cards: [] as TypeCard[] };
-        const tmp = _.findIndex(views, { title: 'eWeLink Smart Home' });
-
-        if (~tmp) {
-            lovelace = views[tmp];
+        // const tmp = _.findIndex(views, { title: 'eWeLink Smart Home' });
+        // if (~tmp) {
+        //     lovelace = views[tmp];
+        // }
+        if (views.length) {
+            lovelace = views[0];
         }
+
+        const isDeviceExist = (deviceId: string) => {
+            try {
+                const tmp = JSON.stringify(lovelace);
+                return tmp.includes(deviceId);
+            } catch (error) {
+                return false;
+            }
+        };
+
+        const singalSwitchCard = {
+            type: 'entities',
+            title: 'Switch',
+            state_color: true,
+            show_header_toggle: false,
+            entities: [] as string[],
+        };
+
         for (let device of Controller.deviceMap.values()) {
+            if (isDeviceExist(device.entityId)) {
+                continue;
+            }
+            if (device instanceof DiyController || device instanceof CloudSwitchController || device instanceof CloudPowerDetectionSwitchController) {
+                singalSwitchCard.entities.push(device.entityId);
+                continue;
+            }
+            if (device instanceof LanSwitchController) {
+                if (device.selfApikey && device.devicekey) {
+                    singalSwitchCard.entities.push(device.entityId);
+                }
+                continue;
+            }
             if (device instanceof CloudMultiChannelSwitchController || device instanceof LanMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
                 console.log('Jia ~ file: generateLovelace.ts ~ line 24 ~ generateLovelace ~ device', device);
                 if (!device.maxChannel || device.maxChannel === 1 || !device.deviceName) {
@@ -44,10 +81,16 @@ const generateLovelace = async () => {
                 }
             }
         }
-        if (~tmp) {
-            views[tmp] = lovelace;
-        } else {
-            views.push(lovelace);
+        // if (~tmp) {
+        //     views[tmp] = lovelace;
+        // } else {
+        //     views.push(lovelace);
+        // }
+        if (singalSwitchCard.entities.length) {
+            lovelace.cards.unshift(singalSwitchCard);
+        }
+        if (views) {
+            views[0] = lovelace;
         }
         console.log('Jia ~ file: generateLovelace.ts ~ line 53 ~ generateLovelace ~ lovelace', lovelace);
         return await HASocket.query({

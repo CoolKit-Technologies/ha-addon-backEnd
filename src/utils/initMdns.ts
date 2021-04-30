@@ -8,6 +8,8 @@ import LanSwitchController from '../controller/LanSwitchController';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import { appendData, saveData } from './dataUtil';
 import eventBus from './eventBus';
+import _ from 'lodash';
+import mergeDeviceParams from './mergeDeviceParams';
 
 export default () => {
     return Mdns.createInstance({
@@ -41,7 +43,7 @@ export default () => {
                 const decryptData = device.parseEncryptedData();
                 if (decryptData) {
                     device.updateState(decryptData.switches);
-                    device.params = decryptData;
+                    device.params = mergeDeviceParams(device.params, decryptData);
                 }
             }
             // 触发sse

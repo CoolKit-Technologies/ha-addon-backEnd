@@ -9,6 +9,8 @@ import _ from 'lodash';
 import eventBus from '../utils/eventBus';
 import LanDeviceController from '../controller/LanDeviceController';
 import CloudDeviceController from '../controller/CloudDeviceController';
+import { getAuth } from '../apis/restApi';
+import AuthClass from '../class/AuthClass';
 
 /**
  * @param {string} lang
@@ -102,5 +104,40 @@ const isLogin = async (req: Request, res: Response) => {
         });
     }
 };
+const auth = async (req: Request, res: Response) => {
+    try {
+        console.log('Jia ~ file: user.ts ~ line 110 ~ auth ~ req.body', req.body);
+        if (AuthClass.isValid(req.ip)) {
+            res.json({
+                error: 0,
+                data: null,
+            });
+            return;
+        }
+        const { code, clientId } = req.body;
+        const result = await getAuth(clientId, code);
+        if (result && result.status === 200) {
+            // todo
+            // AuthClass.setAuth(req.ip, clientId, result.data);
+            // eventBus.emit('init-ha-socket');
+            console.log('Jia ~ file: redirectToAuth.ts ~ line 44 ~ result.data', result.data);
+            res.json({
+                error: 0,
+                data: null,
+            });
+        } else {
+            res.json({
+                error: result.status,
+                data: null,
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        res.json({
+            error: 500,
+            data: err,
+        });
+    }
+};
 
-export { login, logout, isLogin };
+export { login, logout, isLogin, auth };

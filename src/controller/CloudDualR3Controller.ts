@@ -3,6 +3,8 @@ import { ICloudDualR3Params } from '../ts/interface/ICloudDeviceParams';
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
+import { getDataSync } from '../utils/dataUtil';
+import mergeDeviceParams from '../utils/mergeDeviceParams';
 
 class CloudDualR3Controller extends CloudDeviceController {
     params: ICloudDualR3Params;
@@ -11,6 +13,7 @@ class CloudDualR3Controller extends CloudDeviceController {
     entityId: string;
     uiid: number;
     maxChannel: number = 2;
+    rate?: number;
     channelName?: { [key: string]: string };
     updateSwitch!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
     updateState!: (switches: ICloudDualR3Params['switches']) => Promise<void>;
@@ -22,6 +25,7 @@ class CloudDualR3Controller extends CloudDeviceController {
         this.uiid = params.extra.uiid;
         this.channelName = params.tags?.ck_channel_name;
         this.online = params.online;
+        this.rate = +getDataSync('rate.json', [this.deviceId]) || 0;
     }
 }
 
@@ -35,6 +39,7 @@ CloudDualR3Controller.prototype.updateSwitch = async function (switches) {
     });
     if (res.error === 0) {
         this.updateState(switches);
+        this.params = mergeDeviceParams(this.params, { switches });
     }
 };
 

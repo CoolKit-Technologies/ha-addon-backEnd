@@ -4,7 +4,7 @@ import Controller from '../controller/Controller';
 import getThings from '../utils/getThings';
 import sleep from '../utils/sleep';
 import initMdns from '../utils/initMdns';
-import { modifyDeviceStatus, changeDeviceUnit } from '../utils/modifyDeviceStatus';
+import { modifyDeviceStatus, changeDeviceUnit, setDeviceRate } from '../utils/modifyDeviceStatus';
 import { getFormattedDeviceList, formatDevice } from '../utils/formatDevice';
 import { removeStates } from '../apis/restApi';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
@@ -19,6 +19,9 @@ import eventBus from '../utils/eventBus';
 import LanDeviceController from '../controller/LanDeviceController';
 import CloudDeviceController from '../controller/CloudDeviceController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
+import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
+import mergeDeviceParams from '../utils/mergeDeviceParams';
+import CloudSwitchController from '../controller/CloudSwitchController';
 
 const mdns = initMdns();
 
@@ -191,7 +194,6 @@ const updateDeviceName = async (req: Request, res: Response) => {
                 eventBus.emit('sse');
             } else {
                 console.log('更新设备名称出错, id:', id, '\nerror:', error);
-
                 res.json({
                     error,
                     data: null,
@@ -256,6 +258,7 @@ const updateChannelName = async (req: Request, res: Response) => {
 const proxy2ws = async (req: Request, res: Response) => {
     try {
         const { apikey, id, params } = req.body;
+        console.log('Jia ~ file: devices.ts ~ line 259 ~ proxy2ws ~ params', params);
         const result = await CkWs.updateThing({
             deviceApikey: apikey,
             deviceid: id,
@@ -266,26 +269,33 @@ const proxy2ws = async (req: Request, res: Response) => {
         if (error === 0) {
             res.json({
                 error: 0,
-                data: null,
+                data: result,
             });
 
             const device = Controller.getDevice(id);
-            if (device instanceof CloudDeviceController) {
-                device.params = _.mergeWith(device.params, params, (objVal, srcVal) => {
-                    if (Array.isArray(objVal) && Array.isArray(srcVal)) {
-                        for (let item of srcVal) {
-                            objVal[item.outlet] = item;
-                        }
-                        return objVal;
-                    }
-                });
+            if (device instanceof CloudDeviceController || device instanceof LanDeviceController) {
+                device.params = mergeDeviceParams(device.params, params);
                 device.online = true;
+            }
+            if (device instanceof CloudSwitchController || device instanceof CloudTandHModificationController) {
+                // 同步到HA
+                device.updateState(device.params.switch);
+            }
+            if (device instanceof CloudPowerDetectionSwitchController) {
+                // 同步到HA
+                device.updateState({
+                    status: device.params.switch,
+                });
+            }
+            if (device instanceof CloudMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
+                // 同步到HA
+                device.updateState(device.params.switches);
             }
             eventBus.emit('sse');
         } else {
             res.json({
                 error,
-                data: null,
+                data: result,
             });
         }
     } catch (err) {
@@ -350,44 +360,32 @@ const upgradeDevice = async (req: Request, res: Response) => {
 };
 
 const updateDiyDevice = async (req: Request, res: Response) => {
+    const { type, id, params } = req.body;
+
     try {
-        const { type, id, params } = req.body;
         const device = Controller.getDevice(id);
         if (device instanceof DiyController) {
             let result;
+            const reqParams = {
+                deviceid: id,
+                ip: device.ip,
+                port: device.port,
+                ...params,
+            };
+            console.log('Jia ~ file: devices.ts ~ line 366 ~ updateDiyDevice ~ reqParams', reqParams);
             if (type === 'switch') {
-                result = await updateDiySwitchAPI({
-                    deviceid: id,
-                    ip: device.ip,
-                    port: device.port,
-                    ...params,
-                });
+                result = await updateDiySwitchAPI(reqParams);
             }
             if (type === 'startup') {
-                result = await updateDiyStartupAPI({
-                    deviceid: id,
-                    ip: device.ip,
-                    port: device.port,
-                    ...params,
-                });
+                result = await updateDiyStartupAPI(reqParams);
             }
             if (type === 'pulse') {
-                result = await updateDiyPulseAPI({
-                    deviceid: id,
-                    ip: device.ip,
-                    port: device.port,
-                    ...params,
-                });
+                result = await updateDiyPulseAPI(reqParams);
             }
             if (type === 'sledOnline') {
-                result = await updateDiySledOnlineAPI({
-                    deviceid: id,
-                    ip: device.ip,
-                    port: device.port,
-                    ...params,
-                });
+                result = await updateDiySledOnlineAPI(reqParams);
             }
-            console.log('Jia ~ file: devices.ts ~ line 320 ~ updateDiyDevice ~ result', result);
+            console.log('Jia ~ file: devices.ts ~ line 381 ~ updateDiyDevice ~ result', result);
             if (result && result.error === 0) {
                 res.json({
                     error: 0,
@@ -405,6 +403,8 @@ const updateDiyDevice = async (req: Request, res: Response) => {
             error: 500,
             data: null,
         });
+        Controller.deviceMap.delete(id);
+        eventBus.emit('sse');
     }
 };
 
@@ -438,13 +438,18 @@ const changeUnit = async (req: Request, res: Response) => {
         const { id, unit } = req.body;
         const device = Controller.getDevice(id);
         if (device instanceof CloudTandHModificationController) {
-            const code = await appendData('unit.json', [id], unit);
-            if (code) {
+            const code = await changeDeviceUnit(id, unit);
+            if (code === 0) {
                 res.json({
                     error: 0,
                     data: null,
                 });
                 device.unit = unit;
+            } else {
+                res.json({
+                    error: 500,
+                    data: null,
+                });
             }
             eventBus.emit('sse');
         } else {
@@ -462,4 +467,52 @@ const changeUnit = async (req: Request, res: Response) => {
     }
 };
 
-export { getDevices, getDeviceById, disableDevice, updateDeviceName, updateChannelName, proxy2ws, getOTAinfo, upgradeDevice, updateDiyDevice, removeDiyDevice, changeUnit };
+// 设置功率检查插座 & DualR3费率
+const setRate = async (req: Request, res: Response) => {
+    try {
+        const { id, rate } = req.body;
+        const device = Controller.getDevice(id);
+        if (device instanceof CloudPowerDetectionSwitchController || device instanceof CloudDualR3Controller) {
+            const code = await setDeviceRate(id, rate);
+            if (code === 0) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+                device.rate = rate;
+            } else {
+                res.json({
+                    error: 500,
+                    data: null,
+                });
+            }
+            eventBus.emit('sse');
+        } else {
+            res.json({
+                error: 402,
+                data: null,
+                msg: 'not such device',
+            });
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+    }
+};
+
+export {
+    getDevices,
+    getDeviceById,
+    disableDevice,
+    updateDeviceName,
+    updateChannelName,
+    proxy2ws,
+    getOTAinfo,
+    upgradeDevice,
+    updateDiyDevice,
+    removeDiyDevice,
+    changeUnit,
+    setRate,
+};

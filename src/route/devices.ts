@@ -11,6 +11,7 @@ import {
     updateDiyDevice,
     removeDiyDevice,
     changeUnit,
+    setRate,
 } from '../services/devices';
 const router = express.Router();
 
@@ -31,7 +32,8 @@ router.post('/updateChannelName', updateChannelName);
 router.post('/proxy2ws', proxy2ws);
 router.post('/getOTAinfo', getOTAinfo);
 router.post('/diy', updateDiyDevice);
+router.post('/device/unit', changeUnit);
+router.post('/device/rate', setRate);
 router.delete('/diy', removeDiyDevice);
-router.delete('/device/unit', changeUnit);
 
 export default router;

@@ -106,6 +106,18 @@ interface ICloudDevice<P = ICloudDeviceParams> {
 -   返回值:
     {error:0,msg:"success",data: {isLogin:boolean}}
 
+#### Auth
+
+-   URL: /user/auth
+-   方法: POST
+-   业务请求参数:　
+    | 名称 | 类型 | 允许空 | 说明 |
+    | ------- | ------ | :----: | --- |
+    | code | string | N | |
+    | clientId | string | N | |
+-   返回值:
+    {error:0,msg:"success",data: null} 
+
 #### 获取设备列表
 
 -   URL: /devices

@@ -31,6 +31,7 @@ CloudSwitchController.prototype.updateSwitch = async function (status) {
     });
     if (res.error === 0) {
         this.updateState(status);
+        this.params.switch = status;
     }
 };
 
