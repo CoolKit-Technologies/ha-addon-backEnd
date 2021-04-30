@@ -95,6 +95,7 @@ class HaSocket {
                     } catch (error) {
                         console.log('Jia ~ file: HASocketClass.ts ~ line 92 ~ HaSocket ~ query ~ error', error);
                         resolve(-1);
+                        this.client.removeEventListener('message', handler);
                     }
                 })
             );
