@@ -121,6 +121,16 @@ export default class Mdns {
                     });
                     callback && callback(lanDevice);
                 }
+                if (tmp.txt?.type === 'multifun_switch') {
+                    const dualR3 = Controller.setDevice({
+                        id: key,
+                        data: tmp as TypeLanDevice,
+                        type: 2,
+                        lanType: 'multifun_switch',
+                    });
+                    console.log('发现局域网的DualR3');
+                    callback && callback(dualR3);
+                }
                 if (tmp.txt?.type === 'enhanced_plug') {
                     // todo
                 }

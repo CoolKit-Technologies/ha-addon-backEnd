@@ -1,24 +1,38 @@
 import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { ICloudDeviceParams } from '../ts/interface/ICloudDeviceParams';
+import ILanDeviceConstrucotr from '../ts/interface/ILanDeviceConstrucotr';
 import AuthUtils from '../utils/lanControlAuthenticationUtils';
 
 abstract class LanDeviceController {
-    type: number = 2;
-    abstract deviceId: string;
     abstract entityId: string;
-    abstract ip: string;
-    abstract port: number;
-    abstract disabled: boolean;
-    abstract iv?: string;
-    abstract encryptedData?: string;
-    abstract devicekey?: string;
-    abstract selfApikey?: string;
-    abstract deviceName?: string;
-    abstract extra?: ICloudDeviceConstrucotr['extra'];
-    abstract params?: ICloudDeviceParams;
-    abstract online?: boolean;
-    abstract index?: number;
+
+    deviceId: string;
+    port: number;
+    disabled: boolean;
+    type: number = 2;
+    target?: string;
+    ip?: string;
+    iv?: string;
+    encryptedData?: string;
+    devicekey?: string;
+    selfApikey?: string;
+    deviceName?: string;
+    extra?: ICloudDeviceConstrucotr['extra'];
+    params?: ICloudDeviceParams;
+    online: boolean;
+    index?: number;
     parseEncryptedData!: () => any;
+
+    constructor(props: ILanDeviceConstrucotr) {
+        const { deviceId, ip, port = 8081, disabled, encryptedData, iv } = props;
+        this.ip = ip;
+        this.port = port;
+        this.deviceId = deviceId;
+        this.iv = iv;
+        this.disabled = disabled;
+        this.encryptedData = encryptedData;
+        this.online = true;
+    }
 }
 
 LanDeviceController.prototype.parseEncryptedData = function () {

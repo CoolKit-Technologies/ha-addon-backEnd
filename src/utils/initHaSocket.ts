@@ -17,8 +17,6 @@ import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import eventBus from './eventBus';
 
 /**
- *
- *
  * @param {string} entity_id 实体id
  * @param {string} state // on | off
  * @param {*} res socket 返回的信息主体

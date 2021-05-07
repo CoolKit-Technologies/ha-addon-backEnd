@@ -1,31 +1,38 @@
 import axios from 'axios';
 import { setSwitches } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
-import { ICloudMultiChannelSwitchParams } from '../ts/interface/ICloudDeviceParams';
-import ILanDeviceConstrucotr from '../ts/interface/ILanDeviceConstrucotr';
+import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
+import { ICloudDualR3Params } from '../ts/interface/ICloudDeviceParams';
 import LanDeviceController from './LanDeviceController';
-
+type TypeConstrucotr = {
+    deviceId: string;
+    ip: string;
+    port?: number;
+    disabled: boolean;
+    encryptedData?: string;
+    iv: string;
+};
 type TypeSwitch = {
     outlet: number;
     switch: string;
 };
 type TypeSwitches = TypeSwitch[];
 
-class LanMultiChannelSwitchController extends LanDeviceController {
+class LanDualR3Controller extends LanDeviceController {
+    params?: ICloudDualR3Params;
     entityId: string;
-    params?: ICloudMultiChannelSwitchParams;
     maxChannel?: number;
     channelName?: { [key: string]: string };
     setSwitch!: (switches: TypeSwitch[]) => Promise<void>;
     updateState!: (switches: TypeSwitches) => Promise<any>;
-    constructor(props: ILanDeviceConstrucotr) {
+    constructor(props: TypeConstrucotr) {
         const { deviceId } = props;
         super(props);
         this.entityId = `switch.${deviceId}`;
     }
 }
 
-LanMultiChannelSwitchController.prototype.setSwitch = async function (switches) {
+LanDualR3Controller.prototype.setSwitch = async function (switches) {
     // let apikey = getDataSync('user.json', ['user', 'apikey']);
     if (this.devicekey && this.selfApikey) {
         const res = await setSwitches({
@@ -44,7 +51,7 @@ LanMultiChannelSwitchController.prototype.setSwitch = async function (switches) 
     }
 };
 
-LanMultiChannelSwitchController.prototype.updateState = async function (switches) {
+LanDualR3Controller.prototype.updateState = async function (switches) {
     if (this.disabled) {
         return;
     }
@@ -63,4 +70,4 @@ LanMultiChannelSwitchController.prototype.updateState = async function (switches
     });
 };
 
-export default LanMultiChannelSwitchController;
+export default LanDualR3Controller;

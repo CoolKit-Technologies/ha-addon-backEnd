@@ -32,6 +32,7 @@ import CloudDoubleColorLightController from './CloudDoubleColorLightController';
 import UnsupportDeviceController from './UnsupportDeviceController';
 import CloudDualR3Controller from './CloudDualR3Controller';
 import { device } from 'coolkit-open-api/dist/api';
+import LanDualR3Controller from './LanDualR3Controller';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -88,7 +89,7 @@ class Controller {
         if (type === 2) {
             const params = formatLanDevice(data as TypeLanDevice);
             // 如果ip不存在说明该设备可能不支持局域网
-            if (!params || !params.ip) {
+            if (!params || (!params.ip && !params.target)) {
                 console.log('该设备不支持局域网', params?.deviceId);
                 return;
             }
@@ -109,6 +110,15 @@ class Controller {
 
             if (lanType === 'strip') {
                 const lanDevice = new LanMultiChannelSwitchController({
+                    ...params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, lanDevice);
+                return lanDevice;
+            }
+
+            if (lanType === 'multifun_switch') {
+                const lanDevice = new LanDualR3Controller({
                     ...params,
                     disabled,
                 });

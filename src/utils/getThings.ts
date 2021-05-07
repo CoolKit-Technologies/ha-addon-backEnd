@@ -15,6 +15,7 @@ import CloudDoubleColorLightController from '../controller/CloudDoubleColorLight
 import LanSwitchController from '../controller/LanSwitchController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import { getDataSync } from './dataUtil';
+import LanDualR3Controller from '../controller/LanDualR3Controller';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -50,6 +51,14 @@ export default async () => {
                         }
                     }
                     if (old instanceof LanMultiChannelSwitchController) {
+                        old.channelName = tags?.ck_channel_name;
+                        old.maxChannel = getMaxChannelByUiid(extra.uiid);
+                        const decryptData = old.parseEncryptedData() as any;
+                        if (decryptData) {
+                            old.updateState(decryptData.switches);
+                        }
+                    }
+                    if (old instanceof LanDualR3Controller) {
                         old.channelName = tags?.ck_channel_name;
                         old.maxChannel = getMaxChannelByUiid(extra.uiid);
                         const decryptData = old.parseEncryptedData() as any;

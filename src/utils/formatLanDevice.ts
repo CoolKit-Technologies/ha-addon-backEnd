@@ -12,6 +12,7 @@ export default (device: TypeLanDevice) => {
             encryptedData: `${data1}${data2}${data3}${data4}`,
             ip: a,
             port: srv.port,
+            target: srv.target,
             iv: AuthUtils.decryptionBase64(txt.iv),
         };
     } catch (error) {
