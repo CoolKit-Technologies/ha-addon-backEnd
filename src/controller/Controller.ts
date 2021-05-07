@@ -176,21 +176,21 @@ class Controller {
                 return thmDevice;
             }
             // RGB灯球
-            if (data.extra.uiid === 22) {
-                const tmp = data as ICloudDevice<ICloudRGBLightParams>;
-                const rgbLight = new CloudRGBLightController({
-                    deviceId: tmp.deviceid,
-                    deviceName: tmp.name,
-                    apikey: tmp.apikey,
-                    extra: tmp.extra,
-                    params: tmp.params,
-                    online: tmp.online,
-                    disabled,
-                    index: _index,
-                });
-                Controller.deviceMap.set(id, rgbLight);
-                return rgbLight;
-            }
+            // if (data.extra.uiid === 22) {
+            //     const tmp = data as ICloudDevice<ICloudRGBLightParams>;
+            //     const rgbLight = new CloudRGBLightController({
+            //         deviceId: tmp.deviceid,
+            //         deviceName: tmp.name,
+            //         apikey: tmp.apikey,
+            //         extra: tmp.extra,
+            //         params: tmp.params,
+            //         online: tmp.online,
+            //         disabled,
+            //         index: _index,
+            //     });
+            //     Controller.deviceMap.set(id, rgbLight);
+            //     return rgbLight;
+            // }
             // 功率检测告警开关
             if (data.extra.uiid === 32 || data.extra.uiid === 5) {
                 const tmp = data as ICloudDevice<ICloudPowerDetectionSwitchParams>;
@@ -208,53 +208,53 @@ class Controller {
                 return switchDevice;
             }
             // 调光开关
-            if (data.extra.uiid === 36) {
-                const tmp = data as ICloudDevice<ICloudDimmingParams>;
-                const dimming = new CloudDimmingController({
-                    deviceId: tmp.deviceid,
-                    deviceName: tmp.name,
-                    apikey: tmp.apikey,
-                    extra: tmp.extra,
-                    params: tmp.params,
-                    online: tmp.online,
-                    disabled,
-                    index: _index,
-                });
-                Controller.deviceMap.set(id, dimming);
-                return dimming;
-            }
+            // if (data.extra.uiid === 36) {
+            //     const tmp = data as ICloudDevice<ICloudDimmingParams>;
+            //     const dimming = new CloudDimmingController({
+            //         deviceId: tmp.deviceid,
+            //         deviceName: tmp.name,
+            //         apikey: tmp.apikey,
+            //         extra: tmp.extra,
+            //         params: tmp.params,
+            //         online: tmp.online,
+            //         disabled,
+            //         index: _index,
+            //     });
+            //     Controller.deviceMap.set(id, dimming);
+            //     return dimming;
+            // }
             // RGB灯带
-            if (data.extra.uiid === 59) {
-                const tmp = data as ICloudDevice<ICloudRGBLightStripParams>;
-                const device = new CloudRGBLightStripController({
-                    deviceId: tmp.deviceid,
-                    deviceName: tmp.name,
-                    apikey: tmp.apikey,
-                    extra: tmp.extra,
-                    params: tmp.params,
-                    online: tmp.online,
-                    disabled,
-                    index: _index,
-                });
-                Controller.deviceMap.set(id, device);
-                return device;
-            }
+            // if (data.extra.uiid === 59) {
+            //     const tmp = data as ICloudDevice<ICloudRGBLightStripParams>;
+            //     const device = new CloudRGBLightStripController({
+            //         deviceId: tmp.deviceid,
+            //         deviceName: tmp.name,
+            //         apikey: tmp.apikey,
+            //         extra: tmp.extra,
+            //         params: tmp.params,
+            //         online: tmp.online,
+            //         disabled,
+            //         index: _index,
+            //     });
+            //     Controller.deviceMap.set(id, device);
+            //     return device;
+            // }
             // 双色冷暖灯
-            if (data.extra.uiid === 103) {
-                const tmp = data as ICloudDevice<IDoubleCloudLightParams>;
-                const device = new CloudDoubleColorLightController({
-                    deviceId: tmp.deviceid,
-                    deviceName: tmp.name,
-                    apikey: tmp.apikey,
-                    extra: tmp.extra,
-                    params: tmp.params,
-                    disabled,
-                    online: tmp.online,
-                    index: _index,
-                });
-                Controller.deviceMap.set(id, device);
-                return device;
-            }
+            // if (data.extra.uiid === 103) {
+            //     const tmp = data as ICloudDevice<IDoubleCloudLightParams>;
+            //     const device = new CloudDoubleColorLightController({
+            //         deviceId: tmp.deviceid,
+            //         deviceName: tmp.name,
+            //         apikey: tmp.apikey,
+            //         extra: tmp.extra,
+            //         params: tmp.params,
+            //         disabled,
+            //         online: tmp.online,
+            //         index: _index,
+            //     });
+            //     Controller.deviceMap.set(id, device);
+            //     return device;
+            // }
             // DualR3
             if (data.extra.uiid === 126) {
                 const tmp = data as ICloudDevice<ICloudDualR3Params>;
