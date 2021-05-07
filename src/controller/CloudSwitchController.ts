@@ -23,7 +23,7 @@ class CloudSwitchController extends CloudDeviceController {
 
 CloudSwitchController.prototype.updateSwitch = async function (status) {
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params: {
             switch: status,

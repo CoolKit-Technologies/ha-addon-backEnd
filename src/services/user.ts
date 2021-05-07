@@ -36,11 +36,13 @@ const login = async (req: Request, res: Response) => {
             saveData('user.json', JSON.stringify({ ...result.data, login: { ...req.body } }));
             const at = _.get(result, ['data', 'at']);
             const apikey = _.get(result, ['data', 'user', 'apikey']);
+            const region = _.get(result, ['data', 'region']);
             await coolKitWs.init({
                 appid: appId,
-                secret: appSecret,
                 at,
                 apikey,
+                region,
+                userAgent: 'app',
             });
             await getThings();
             eventBus.emit('sse');

@@ -26,7 +26,7 @@ class CloudTandHModificationController extends CloudDeviceController {
 
 CloudTandHModificationController.prototype.updateSwitch = async function (status) {
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params: {
             switch: status,

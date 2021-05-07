@@ -231,7 +231,7 @@ const proxy2ws = async (req: Request, res: Response) => {
         const { apikey, id, params } = req.body;
         console.log('Jia ~ file: devices.ts ~ line 259 ~ proxy2ws ~ params', params);
         const result = await CkWs.updateThing({
-            deviceApikey: apikey,
+            ownerApikey: apikey,
             deviceid: id,
             params,
         });
@@ -305,7 +305,7 @@ const upgradeDevice = async (req: Request, res: Response) => {
     try {
         const { apikey, id, params } = req.body;
         const result = await CkWs.upgradeThing({
-            deviceApikey: apikey,
+            ownerApikey: apikey,
             deviceid: id,
             params,
         });

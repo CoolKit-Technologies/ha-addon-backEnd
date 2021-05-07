@@ -19,14 +19,16 @@ const apikey = getDataSync('user.json', ['user', 'apikey']);
 
 export default async () => {
     const at = getDataSync('user.json', ['at']);
+    const region = getDataSync('user.json', ['region']);
     if (!at || !apikey) {
         return -1;
     }
     await coolKitWs.init({
         appid: appId,
-        secret: appSecret,
         at,
         apikey,
+        region,
+        userAgent: 'app',
     });
     console.log('Jia ~ file: initCkWs.ts ~ line 29 ~ at', at);
 

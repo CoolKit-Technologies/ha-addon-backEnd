@@ -21,7 +21,7 @@ class CloudDimmingController extends CloudDeviceController {
 CloudDimmingController.prototype.updateLight = async function (params) {
     console.log('Jia ~ file: CloudDimmingController.ts ~ line 30 ~ params', params);
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params,
     });

@@ -31,7 +31,7 @@ class CloudDualR3Controller extends CloudDeviceController {
 
 CloudDualR3Controller.prototype.updateSwitch = async function (switches) {
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params: {
             switches,

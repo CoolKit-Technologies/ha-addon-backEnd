@@ -28,7 +28,7 @@ class CloudMultiChannelSwitchController extends CloudDeviceController {
 
 CloudMultiChannelSwitchController.prototype.updateSwitch = async function (switches) {
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params: {
             switches,

@@ -101,7 +101,7 @@ CloudRGBLightStripController.prototype.parseCkData2Ha = function ({ colorR, colo
 
 CloudRGBLightStripController.prototype.updateLight = async function (params) {
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params: {
             ...params,

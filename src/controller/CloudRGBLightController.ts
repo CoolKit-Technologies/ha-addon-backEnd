@@ -160,7 +160,7 @@ CloudRGBLightController.prototype.updateLight = async function (params) {
         return;
     }
     const res = await coolKitWs.updateThing({
-        deviceApikey: this.apikey,
+        ownerApikey: this.apikey,
         deviceid: this.deviceId,
         params,
     });

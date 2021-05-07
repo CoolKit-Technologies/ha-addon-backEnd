@@ -7,12 +7,14 @@ import { updateStates } from '../apis/restApi';
 (async () => {
     const at = getDataSync('user.json', ['at']);
     const apikey = getDataSync('user.json', ['user', 'apikey']);
+    const region = getDataSync('user.json', ['region']);
 
     const result = await coolKitWs.init({
         appid: appId,
-        secret: appSecret,
         at,
         apikey,
+        region,
+        userAgent: 'app',
     });
 
     console.log('连接的结果: ', result);

@@ -12,8 +12,8 @@
     "license": "ISC",
     "dependencies": {
         "color-convert": "^2.0.1",
-        "coolkit-open-api": "^0.3.3",
-        "coolkit-ws": "^1.2.0",
+        "coolkit-open-api": "^0.3.4",
+        "coolkit-ws": "^1.5.5",
         "cors": "^2.8.5",
         "crypto-js": "^4.0.0",
         "eventemitter3": "^4.0.7",
