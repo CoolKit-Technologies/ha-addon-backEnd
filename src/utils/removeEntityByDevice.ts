@@ -9,6 +9,9 @@ import LanDualR3Controller from '../controller/LanDualR3Controller';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 
 export default (device: LanDeviceController | DiyController | CloudDeviceController) => {
+    if (device instanceof DiyController) {
+        return;
+    }
     if (device instanceof CloudTandHModificationController) {
         removeStates(device.entityId);
         removeStates(`sensor.${device.deviceId}_h`);
@@ -26,5 +29,6 @@ export default (device: LanDeviceController | DiyController | CloudDeviceControl
             }
         }
     }
+
     removeStates(device.entityId);
 };
