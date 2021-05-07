@@ -15,6 +15,7 @@ import CloudTandHModificationController from '../controller/CloudTandHModificati
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import eventBus from './eventBus';
+import LanDualR3Controller from '../controller/LanDualR3Controller';
 
 /**
  * @param {string} entity_id 实体id
@@ -36,7 +37,7 @@ const handleDeviceByEntityId = async (entity_id: string, state: string, res: any
     }
 
     // LAN
-    if (device instanceof LanMultiChannelSwitchController) {
+    if (device instanceof LanMultiChannelSwitchController || device instanceof LanDualR3Controller) {
         if (mutiSwitchState) {
             await device.setSwitch(mutiSwitchState);
         } else {
@@ -80,7 +81,7 @@ const handleDeviceByEntityId = async (entity_id: string, state: string, res: any
         await device.updateSwitch(state);
     }
 
-    if (device instanceof CloudMultiChannelSwitchController) {
+    if (device instanceof CloudMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
         if (mutiSwitchState) {
             await device.updateSwitch(mutiSwitchState);
         } else {
@@ -119,19 +120,6 @@ const handleDeviceByEntityId = async (entity_id: string, state: string, res: any
             ct: color_temp,
             br: brightness_pct,
         });
-    }
-    if (device instanceof CloudDualR3Controller) {
-        if (mutiSwitchState) {
-            await device.updateSwitch(mutiSwitchState);
-        } else {
-            const [id, outlet] = entity_id.split('_');
-            await device.updateSwitch([
-                {
-                    outlet: +outlet - 1,
-                    switch: state,
-                },
-            ]);
-        }
     }
 };
 

@@ -17,7 +17,13 @@ type TypeSwitch = {
     switch: string;
 };
 type TypeSwitches = TypeSwitch[];
-
+/**
+ *
+ *
+ * @class LanDualR3Controller
+ * @extends {LanDeviceController}
+ * @deprecated 局域网控制有问题，dualR3可能不支持局域网
+ */
 class LanDualR3Controller extends LanDeviceController {
     params?: ICloudDualR3Params;
     entityId: string;
@@ -33,7 +39,8 @@ class LanDualR3Controller extends LanDeviceController {
 }
 
 LanDualR3Controller.prototype.setSwitch = async function (switches) {
-    // let apikey = getDataSync('user.json', ['user', 'apikey']);
+    console.log('Jia ~ file: LanDualR3Controller.ts ~ line 48 ~ this.target', this.target);
+    console.log('Jia ~ file: LanDualR3Controller.ts ~ line 48 ~ this.ip', this.ip);
     if (this.devicekey && this.selfApikey) {
         const res = await setSwitches({
             ip: this.ip! || this.target!,
@@ -45,6 +52,7 @@ LanDualR3Controller.prototype.setSwitch = async function (switches) {
                 switches,
             }),
         });
+
         if (res && res.data && res.data.error === 0) {
             this.updateState(switches);
         }
@@ -58,14 +66,18 @@ LanDualR3Controller.prototype.updateState = async function (switches) {
     switches &&
         switches.forEach(({ outlet, switch: status }) => {
             const name = this.channelName ? this.channelName[outlet] : outlet + 1;
+            let state = status;
+            if (!this.online) {
+                state = 'unavailable';
+            }
             updateStates(`${this.entityId}_${outlet + 1}`, {
                 entity_id: `${this.entityId}_${outlet + 1}`,
-                state: status,
+                state,
                 attributes: {
                     restored: true,
                     supported_features: 0,
                     friendly_name: `${this.deviceName}-${name}`,
-                    state: status,
+                    state,
                 },
             });
         });

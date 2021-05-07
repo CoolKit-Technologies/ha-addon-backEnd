@@ -5,6 +5,7 @@ import { HaRestURL } from '../config/url';
 
 const restRequest = axios.create({
     baseURL: HaRestURL,
+    timeout: 5000,
 });
 
 restRequest.interceptors.request.use((val) => {
@@ -34,8 +35,6 @@ const updateStates = async (entityId: string, data: any) => {
         data,
     }).catch((e) => {
         console.log('更新设备到HA出错：', entityId, '\ndata: ', data);
-        console.log('Jia ~ file: restApi.ts ~ line 10 ~ AuthClass.curAuth', AuthClass.curAuth);
-        console.log('Jia ~ file: restApi.ts ~ line 50 ~ updateStates ~ e', e);
     });
 };
 

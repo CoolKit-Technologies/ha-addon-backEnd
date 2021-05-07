@@ -126,14 +126,20 @@ CloudRGBLightStripController.prototype.updateState = async function ({ status, b
     if (this.disabled) {
         return;
     }
+
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
+
     updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status,
+        state,
         attributes: {
             restored: true,
             supported_features: 17,
             friendly_name: this.deviceName,
-            state: status,
+            state,
             brightness: brightness === undefined ? this.brightness : brightness,
             hs_color,
             mode: mode === undefined ? this.mode : mode,

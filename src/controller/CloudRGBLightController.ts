@@ -196,14 +196,22 @@ CloudRGBLightController.prototype.updateLight = async function (params) {
  * @description 更新状态到HA
  */
 CloudRGBLightController.prototype.updateState = async function ({ status, brightness, colorTemp, hsColor }) {
+    if (this.disabled) {
+        return;
+    }
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
+
     updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status,
+        state,
         attributes: {
             restored: true,
             supported_features: 19,
             friendly_name: this.deviceName,
-            state: status,
+            state,
             min_mireds: 1,
             max_mireds: 3,
             brightness: brightness !== undefined ? brightness : this.brightness,

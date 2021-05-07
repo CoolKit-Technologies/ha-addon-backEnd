@@ -12,6 +12,7 @@ import CloudDeviceController from '../controller/CloudDeviceController';
 import { getAuth } from '../apis/restApi';
 import AuthClass from '../class/AuthClass';
 import generateLovelace from '../utils/generateLovelace';
+import removeEntityByDevice from '../utils/removeEntityByDevice';
 
 /**
  * @param {string} lang
@@ -57,6 +58,7 @@ const logout = async (req: Request, res: Response) => {
         console.log('Jia ~ file: user.ts ~ line 37 ~ logout ~ result', result);
         clearData('disabled.json');
         for (let [id, device] of Controller.deviceMap.entries()) {
+            removeEntityByDevice(device);
             if (device instanceof LanDeviceController) {
                 device.selfApikey = undefined;
                 device.devicekey = undefined;

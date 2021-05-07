@@ -6,11 +6,9 @@ import coolKitWs from 'coolkit-ws';
 import _ from 'lodash';
 import { TypeLtypeParams, TypeLtype } from '../ts/type/TypeLtype';
 class CloudDoubleColorLightController extends CloudDeviceController {
-    online: boolean;
     disabled: boolean;
     entityId: string;
     deviceName: string;
-    apikey: string;
     uiid: number = 103;
     params: IDoubleCloudLightParams;
     ct: number;
@@ -21,24 +19,20 @@ class CloudDoubleColorLightController extends CloudDeviceController {
 
     constructor(params: ICloudDeviceConstrucotr<IDoubleCloudLightParams>) {
         super(params);
-        const { ltype } = params.params;
         this.entityId = `light.${params.deviceId}`;
         this.deviceName = params.deviceName;
-        this.apikey = params.apikey;
         this.disabled = params.disabled!;
-        this.ltype = ltype;
+        this.params = params.params;
+
+        const { ltype } = params.params;
         const { br, ct } = params.params[ltype];
+        this.ltype = ltype;
         this.br = br;
         this.ct = 255 - ct;
-        this.online = params.online;
-        this.params = params.params;
     }
 }
 
 CloudDoubleColorLightController.prototype.updateLight = async function ({ switch: status = 'on', br, ct }) {
-    if (this.disabled) {
-        return;
-    }
     let tmp: any = {};
     if (status === 'off') {
         tmp.switch = 'off';
@@ -66,6 +60,10 @@ CloudDoubleColorLightController.prototype.updateLight = async function ({ switch
  * @description 更新状态到HA
  */
 CloudDoubleColorLightController.prototype.updateState = async function (params) {
+    if (this.disabled) {
+        return;
+    }
+
     const { switch: status = 'on', ltype } = params;
     let br: number | undefined;
     let ct: number | undefined;
@@ -75,14 +73,19 @@ CloudDoubleColorLightController.prototype.updateState = async function (params) 
         br = tmpBr;
         ct = tmpCt;
     }
+
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
     updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status,
+        state,
         attributes: {
             restored: true,
             supported_features: 3,
             friendly_name: this.deviceName,
-            state: status,
+            state,
             min_mireds: 1,
             max_mireds: 255,
             light_type: ltype,

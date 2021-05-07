@@ -1,11 +1,6 @@
 import CkApi from 'coolkit-open-api';
-import CloudDeviceController from '../controller/CloudDeviceController';
-import Controller from '../controller/Controller';
-import LanDeviceController from '../controller/LanDeviceController';
 
 /**
- *
- *
  * @param {string} deviceid
  * @param {string} name
  * @description 修改设备名称

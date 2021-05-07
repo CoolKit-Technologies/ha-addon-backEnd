@@ -51,19 +51,25 @@ CloudDualR3Controller.prototype.updateState = async function (switches) {
     if (this.disabled) {
         return;
     }
-    switches.forEach(({ outlet, switch: status }) => {
-        const name = this.channelName ? this.channelName[outlet] : outlet + 1;
-        updateStates(`${this.entityId}_${outlet + 1}`, {
-            entity_id: `${this.entityId}_${outlet + 1}`,
-            state: status,
-            attributes: {
-                restored: true,
-                supported_features: 0,
-                friendly_name: `${this.deviceName}-${name}`,
-                state: status,
-            },
+    switches &&
+        switches.forEach(({ outlet, switch: status }) => {
+            const name = this.channelName ? this.channelName[outlet] : outlet + 1;
+            let state = status;
+            if (!this.online) {
+                state = 'unavailable';
+            }
+
+            updateStates(`${this.entityId}_${outlet + 1}`, {
+                entity_id: `${this.entityId}_${outlet + 1}`,
+                state,
+                attributes: {
+                    restored: true,
+                    supported_features: 0,
+                    friendly_name: `${this.deviceName}-${name}`,
+                    state,
+                },
+            });
         });
-    });
 };
 
 export default CloudDualR3Controller;

@@ -23,6 +23,7 @@ import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetecti
 import mergeDeviceParams from '../utils/mergeDeviceParams';
 import CloudSwitchController from '../controller/CloudSwitchController';
 import syncDevice2Ha from '../utils/syncDevice2Ha';
+import removeEntityByDevice from '../utils/removeEntityByDevice';
 
 const mdns = initMdns();
 
@@ -121,38 +122,13 @@ const disableDevice = async (req: Request, res: Response) => {
         device!.disabled = disabled;
         const error = await modifyDeviceStatus(id, disabled);
         if (device && disabled) {
-            if (device instanceof CloudTandHModificationController) {
-                removeStates(device.entityId);
-                removeStates(`sensor.${device.deviceId}_h`);
-                removeStates(`sensor.${device.deviceId}_t`);
-            }
-            if (device instanceof CloudMultiChannelSwitchController) {
-                for (let i = 0; i < device.maxChannel; i++) {
-                    removeStates(`${device.entityId}_${i + 1}`);
-                }
-            }
-            if (device instanceof LanMultiChannelSwitchController) {
-                if (device.maxChannel) {
-                    for (let i = 0; i < device.maxChannel; i++) {
-                        removeStates(`${device.entityId}_${i + 1}`);
-                    }
-                }
-            }
-            removeStates(device.entityId);
+            removeEntityByDevice(device);
         }
-
         if (!disabled) {
-            mdns.query({
-                questions: [
-                    {
-                        name: '_ewelink._tcp.local',
-                        type: 'PTR',
-                    },
-                ],
+            syncDevice2Ha({
+                syncLovelace: true,
+                sleepTime: 2000,
             });
-            await getThings();
-            // todo
-            await sleep(2000);
         }
         if (error === 0) {
             res.json({

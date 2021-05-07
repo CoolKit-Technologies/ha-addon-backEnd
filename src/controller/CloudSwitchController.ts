@@ -42,14 +42,20 @@ CloudSwitchController.prototype.updateState = async function (status) {
     if (this.disabled) {
         return;
     }
+
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
+
     updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status,
+        state,
         attributes: {
             restored: true,
             supported_features: 0,
             friendly_name: this.deviceName,
-            state: status,
+            state,
         },
     });
 };

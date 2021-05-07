@@ -63,20 +63,25 @@ CloudPowerDetectionSwitchController.prototype.updateState = async function ({ po
     if (this.disabled) {
         return;
     }
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
+
     const res = await updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status || this.state,
+        state: state || this.state,
         attributes: {
             restored: true,
             supported_features: 0,
             friendly_name: this.deviceName,
-            power: `${power || this.power} W`,
-            current: `${current || this.current} A`,
-            voltage: `${voltage || this.voltage} V`,
-            state: status || this.state,
+            power: `${power || this.power || 0} W`,
+            current: `${current || this.current || 0} A`,
+            voltage: `${voltage || this.voltage || 0} V`,
+            state: state || this.state,
         },
     });
-    status && (this.state = status);
+    state && (this.state = state);
     power && (this.power = power);
     current && (this.current = current);
     voltage && (this.voltage = voltage);
