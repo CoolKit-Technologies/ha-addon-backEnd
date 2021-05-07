@@ -36,8 +36,9 @@ CkApi.init({
     await initHaSocket(); // 跟HA建立socket连接
     await initCkWs(); // 跟易微联Socket建立连接
     await initCkApi(); // 初始化v2接口并保持登录
+    await sleep(3000);
+    generateLovelace();
     // serviceRegistered(); // 注册HA相关服务
-    // await sleep(3000);
 })();
 
 const app = express();

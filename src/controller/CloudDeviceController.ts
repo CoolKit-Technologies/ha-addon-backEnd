@@ -7,12 +7,12 @@ abstract class CloudDeviceController {
     deviceName: string;
     deviceId: string;
     index: number;
+    online: boolean;
     extra: ICloudDeviceConstrucotr['extra'];
     abstract params: ICloudDeviceConstrucotr['params'];
     abstract uiid: number;
     abstract disabled: boolean;
     abstract entityId: string;
-    abstract online: boolean;
     constructor(data: ICloudDeviceConstrucotr) {
         this.rssi = data.params.rssi;
         this.apikey = data.apikey;
@@ -20,6 +20,7 @@ abstract class CloudDeviceController {
         this.deviceName = data.deviceName;
         this.extra = data.extra;
         this.index = data.index;
+        this.online = data.online;
     }
 }
 

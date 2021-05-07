@@ -135,9 +135,9 @@ const handleDeviceByEntityId = async (entity_id: string, state: string, res: any
     }
 };
 
-export default async () => {
+export default async (reconnect = false) => {
     try {
-        const res = await HASocket.init();
+        const res = await HASocket.init(reconnect);
         if (res === 0) {
             HASocket.subscribeEvents('call_service');
             HASocket.handleEvent('call_service', async (res: TypeHaSocketCallServiceData) => {

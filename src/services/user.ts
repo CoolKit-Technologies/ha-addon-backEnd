@@ -11,6 +11,7 @@ import LanDeviceController from '../controller/LanDeviceController';
 import CloudDeviceController from '../controller/CloudDeviceController';
 import { getAuth } from '../apis/restApi';
 import AuthClass from '../class/AuthClass';
+import generateLovelace from '../utils/generateLovelace';
 
 /**
  * @param {string} lang
@@ -42,6 +43,7 @@ const login = async (req: Request, res: Response) => {
             });
             await getThings();
             eventBus.emit('sse');
+            generateLovelace();
         }
         res.json(result);
     } catch (err) {
@@ -66,6 +68,7 @@ const logout = async (req: Request, res: Response) => {
                 Controller.deviceMap.delete(id);
             }
         }
+        Controller.unsupportDeviceMap.clear();
         const ckRes = await CkApi.user.logout();
         console.log('Jia ~ file: user.ts ~ line 41 ~ logout ~ ckRes', ckRes);
         res.json({

@@ -4,7 +4,6 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
 class CloudDimmingController extends CloudDeviceController {
-    online: boolean;
     disabled: boolean;
     entityId: string;
     uiid: number = 36;
@@ -15,7 +14,6 @@ class CloudDimmingController extends CloudDeviceController {
         super(params);
         this.entityId = `light.${params.deviceId}`;
         this.disabled = params.disabled!;
-        this.online = params.online;
         this.params = params.params;
     }
 }
@@ -37,14 +35,19 @@ CloudDimmingController.prototype.updateState = async function ({ status, bright 
     if (this.disabled) {
         return;
     }
+    let state = status;
+    if (!this.online) {
+        state = 'unavailable';
+    }
+
     updateStates(this.entityId, {
         entity_id: this.entityId,
-        state: status,
+        state,
         attributes: {
             restored: true,
             supported_features: 1,
             friendly_name: this.deviceName,
-            state: status,
+            state,
             brightness: bright * 2.55,
         },
     });

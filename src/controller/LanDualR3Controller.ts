@@ -55,19 +55,20 @@ LanDualR3Controller.prototype.updateState = async function (switches) {
     if (this.disabled) {
         return;
     }
-    switches.forEach(({ outlet, switch: status }) => {
-        const name = this.channelName ? this.channelName[outlet] : outlet + 1;
-        updateStates(`${this.entityId}_${outlet + 1}`, {
-            entity_id: `${this.entityId}_${outlet + 1}`,
-            state: status,
-            attributes: {
-                restored: true,
-                supported_features: 0,
-                friendly_name: `${this.deviceName}-${name}`,
+    switches &&
+        switches.forEach(({ outlet, switch: status }) => {
+            const name = this.channelName ? this.channelName[outlet] : outlet + 1;
+            updateStates(`${this.entityId}_${outlet + 1}`, {
+                entity_id: `${this.entityId}_${outlet + 1}`,
                 state: status,
-            },
+                attributes: {
+                    restored: true,
+                    supported_features: 0,
+                    friendly_name: `${this.deviceName}-${name}`,
+                    state: status,
+                },
+            });
         });
-    });
 };
 
 export default LanDualR3Controller;

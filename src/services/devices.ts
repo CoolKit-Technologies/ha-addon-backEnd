@@ -22,6 +22,7 @@ import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import mergeDeviceParams from '../utils/mergeDeviceParams';
 import CloudSwitchController from '../controller/CloudSwitchController';
+import syncDevice2Ha from '../utils/syncDevice2Ha';
 
 const mdns = initMdns();
 
@@ -37,16 +38,10 @@ const getDevices = async (req: Request, res: Response) => {
         }
 
         if (refresh) {
-            mdns.query({
-                questions: [
-                    {
-                        name: '_ewelink._tcp.local',
-                        type: 'PTR',
-                    },
-                ],
+            syncDevice2Ha({
+                syncLovelace: false,
+                sleepTime: 2000,
             });
-            await getThings();
-            await sleep(1000);
         }
 
         // const [cloud, lan, diy] = (+type!).toString(2).padStart(3, '0').split('');
