@@ -9,6 +9,10 @@ if (debugMode || !isSupervisor) {
     basePath = path.join(__dirname, '../data');
 }
 
+if (!fs.existsSync(basePath)) {
+    fs.mkdirSync(basePath);
+}
+
 const getDataSync = (fileName: string, namePath: string[] = []) => {
     try {
         const data = fs.readFileSync(path.join(basePath, `/${fileName}`), { encoding: 'utf-8' });
