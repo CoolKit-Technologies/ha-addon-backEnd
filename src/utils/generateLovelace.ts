@@ -4,8 +4,10 @@ import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import CloudMultiChannelSwitchController from '../controller/CloudMultiChannelSwitchController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudSwitchController from '../controller/CloudSwitchController';
+import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import Controller from '../controller/Controller';
 import DiyController from '../controller/DiyDeviceController';
+import LanDualR3Controller from '../controller/LanDualR3Controller';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import LanSwitchController from '../controller/LanSwitchController';
 type TypeCard = {
@@ -59,9 +61,20 @@ const generateLovelace = async () => {
                 }
                 continue;
             }
-            if (device instanceof CloudMultiChannelSwitchController || device instanceof LanMultiChannelSwitchController || device instanceof CloudDualR3Controller) {
-                console.log('Jia ~ file: generateLovelace.ts ~ line 24 ~ generateLovelace ~ device', device);
-                if (!device.maxChannel || device.maxChannel === 1 || !device.deviceName) {
+            if (
+                device instanceof CloudMultiChannelSwitchController ||
+                device instanceof LanMultiChannelSwitchController ||
+                device instanceof CloudDualR3Controller ||
+                device instanceof LanDualR3Controller
+            ) {
+                if (device instanceof LanDualR3Controller) {
+                    console.log("Jia ~ file: generateLovelace.ts ~ line 71 ~ generateLovelace ~ device", device);
+                }
+                if (device.maxChannel === 1 && device.deviceName) {
+                    singalSwitchCard.entities.push(`${device.entityId}_1`);
+                    continue;
+                }
+                if (!device.maxChannel || !device.deviceName) {
                     continue;
                 }
                 const entities = Array.from({ length: device.maxChannel }, (v, k) => {
@@ -72,6 +85,22 @@ const generateLovelace = async () => {
                     entities,
                     title: device.deviceName,
                     state_color: true,
+                    show_header_toggle: true,
+                };
+                let index = _.findIndex(lovelace.cards, { title: device.deviceName });
+                if (~index) {
+                    lovelace.cards[index] = tmpCard;
+                } else {
+                    lovelace.cards.push(tmpCard);
+                }
+            }
+            if (device instanceof CloudTandHModificationController) {
+                const tmpCard = {
+                    type: 'entities',
+                    entities: [`switch.${device.deviceId}`, `sensor.${device.deviceId}_t`, `sensor.${device.deviceId}_h`],
+                    title: device.deviceName,
+                    state_color: true,
+                    show_header_toggle: false,
                 };
                 let index = _.findIndex(lovelace.cards, { title: device.deviceName });
                 if (~index) {

@@ -117,14 +117,14 @@ class Controller {
                 return lanDevice;
             }
 
-            // if (lanType === 'multifun_switch') {
-            //     const lanDevice = new LanDualR3Controller({
-            //         ...params,
-            //         disabled,
-            //     });
-            //     Controller.deviceMap.set(id, lanDevice);
-            //     return lanDevice;
-            // }
+            if (lanType === 'multifun_switch') {
+                const lanDevice = new LanDualR3Controller({
+                    ...params,
+                    disabled,
+                });
+                Controller.deviceMap.set(id, lanDevice);
+                return lanDevice;
+            }
         }
         // CLOUD
         if (type === 4) {

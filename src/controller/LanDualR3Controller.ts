@@ -1,46 +1,30 @@
 import axios from 'axios';
 import { setSwitches } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
-import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { ICloudDualR3Params } from '../ts/interface/ICloudDeviceParams';
+import ILanDeviceConstrucotr from '../ts/interface/ILanDeviceConstrucotr';
 import LanDeviceController from './LanDeviceController';
-type TypeConstrucotr = {
-    deviceId: string;
-    ip: string;
-    port?: number;
-    disabled: boolean;
-    encryptedData?: string;
-    iv: string;
-};
+
 type TypeSwitch = {
     outlet: number;
     switch: string;
 };
 type TypeSwitches = TypeSwitch[];
-/**
- *
- *
- * @class LanDualR3Controller
- * @extends {LanDeviceController}
- * @deprecated 局域网控制有问题，dualR3可能不支持局域网
- */
 class LanDualR3Controller extends LanDeviceController {
     params?: ICloudDualR3Params;
     entityId: string;
-    maxChannel?: number;
+    maxChannel: number = 2;
     channelName?: { [key: string]: string };
     setSwitch!: (switches: TypeSwitch[]) => Promise<void>;
     updateState!: (switches: TypeSwitches) => Promise<any>;
-    constructor(props: TypeConstrucotr) {
-        const { deviceId } = props;
+    constructor(props: ILanDeviceConstrucotr) {
         super(props);
+        const { deviceId } = props;
         this.entityId = `switch.${deviceId}`;
     }
 }
 
 LanDualR3Controller.prototype.setSwitch = async function (switches) {
-    console.log('Jia ~ file: LanDualR3Controller.ts ~ line 48 ~ this.target', this.target);
-    console.log('Jia ~ file: LanDualR3Controller.ts ~ line 48 ~ this.ip', this.ip);
     if (this.devicekey && this.selfApikey) {
         const res = await setSwitches({
             ip: this.ip! || this.target!,

@@ -8,6 +8,7 @@ const channelMap = new Map<number, number>([
     [112, 1], // 单通道开关微波雷达版
     [113, 2], // 双通道开关微波雷达版
     [114, 3], // 三通道开关微波雷达版
+    [126, 2], // DualR3
 ]);
 
 const getMaxChannelByUiid = (uiid: number) => {

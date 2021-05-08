@@ -24,8 +24,9 @@ abstract class LanDeviceController {
     parseEncryptedData!: () => any;
 
     constructor(props: ILanDeviceConstrucotr) {
-        const { deviceId, ip, port = 8081, disabled, encryptedData, iv } = props;
+        const { deviceId, ip, port = 8081, disabled, encryptedData, iv, target } = props;
         this.ip = ip;
+        this.target = target;
         this.port = port;
         this.deviceId = deviceId;
         this.iv = iv;

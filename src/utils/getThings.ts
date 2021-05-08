@@ -60,7 +60,6 @@ export default async () => {
                     }
                     if (old instanceof LanDualR3Controller) {
                         old.channelName = tags?.ck_channel_name;
-                        old.maxChannel = getMaxChannelByUiid(extra.uiid);
                         const decryptData = old.parseEncryptedData() as any;
                         if (decryptData) {
                             old.updateState(decryptData.switches);
