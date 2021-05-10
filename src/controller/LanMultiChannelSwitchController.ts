@@ -3,6 +3,7 @@ import { setSwitches } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
 import { ICloudMultiChannelSwitchParams } from '../ts/interface/ICloudDeviceParams';
 import ILanDeviceConstrucotr from '../ts/interface/ILanDeviceConstrucotr';
+import mergeDeviceParams from '../utils/mergeDeviceParams';
 import LanDeviceController from './LanDeviceController';
 
 type TypeSwitch = {
@@ -40,6 +41,7 @@ LanMultiChannelSwitchController.prototype.setSwitch = async function (switches) 
         });
         if (res && res.data && res.data.error === 0) {
             this.updateState(switches);
+            this.params = mergeDeviceParams(this.params, { switches });
         }
     }
 };

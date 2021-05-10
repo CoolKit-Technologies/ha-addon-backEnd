@@ -99,10 +99,18 @@ class Controller {
                 old.encryptedData = params?.encryptedData;
                 return old;
             }
+
+            // 如果设备之前是Cloud设备,需要保持设备的位置不便
+            let tmpIndex;
+            if (old instanceof CloudDeviceController) {
+                tmpIndex = old.index;
+            }
+
             if (lanType === 'plug') {
                 const lanDevice = new LanSwitchController({
                     ...params,
                     disabled,
+                    index: tmpIndex,
                 });
                 Controller.deviceMap.set(id, lanDevice);
                 return lanDevice;
@@ -112,6 +120,7 @@ class Controller {
                 const lanDevice = new LanMultiChannelSwitchController({
                     ...params,
                     disabled,
+                    index: tmpIndex,
                 });
                 Controller.deviceMap.set(id, lanDevice);
                 return lanDevice;
@@ -121,6 +130,7 @@ class Controller {
                 const lanDevice = new LanDualR3Controller({
                     ...params,
                     disabled,
+                    index: tmpIndex,
                 });
                 Controller.deviceMap.set(id, lanDevice);
                 return lanDevice;

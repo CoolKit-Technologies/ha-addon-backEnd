@@ -4,6 +4,7 @@ import ICloudDeviceConstrucotr from '../ts/interface/ICloudDeviceConstrucotr';
 import { updateStates } from '../apis/restApi';
 import coolKitWs from 'coolkit-ws';
 import { getMaxChannelByUiid } from '../config/channelMap';
+import mergeDeviceParams from '../utils/mergeDeviceParams';
 class CloudMultiChannelSwitchController extends CloudDeviceController {
     online: boolean;
     disabled: boolean;
@@ -36,6 +37,7 @@ CloudMultiChannelSwitchController.prototype.updateSwitch = async function (switc
     });
     if (res.error === 0) {
         this.updateState(switches);
+        this.params = mergeDeviceParams(this.params, { switches });
     }
 };
 

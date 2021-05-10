@@ -1,6 +1,8 @@
 import { getDataSync } from '../utils/dataUtil';
 import { debugMode, isSupervisor } from './config';
 let url = 'http://homeassistant:8123';
+// let url = 'http://192.168.1.111:8123';
+
 
 if (!debugMode && isSupervisor) {
     url = getDataSync('options.json', ['home_assistant_url']);

@@ -33,6 +33,7 @@ LanSwitchController.prototype.setSwitch = async function (status) {
         });
         if (res?.data && res.data.error === 0) {
             this.updateState(status);
+            this.params!.switch = status;
         }
     }
 };

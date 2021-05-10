@@ -14,6 +14,7 @@ import { getStateByEntityId, updateStates } from '../apis/restApi';
 import CloudDoubleColorLightController from '../controller/CloudDoubleColorLightController';
 import eventBus from './eventBus';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
+import LanDualR3Controller from '../controller/LanDualR3Controller';
 
 const apikey = getDataSync('user.json', ['user', 'apikey']);
 
@@ -89,7 +90,7 @@ export default async () => {
                         console.log('接收到双色灯的信息：', tmp.params);
                         device.updateState(tmp.params);
                     }
-                    if (device instanceof CloudDualR3Controller) {
+                    if (device instanceof CloudDualR3Controller || device instanceof LanDualR3Controller) {
                         console.log('接收到DualR3的信息：', tmp.params);
                         if (tmp.params && tmp.params.switches) {
                             device.updateState(tmp.params.switches);

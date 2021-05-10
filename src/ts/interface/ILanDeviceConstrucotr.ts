@@ -6,4 +6,5 @@ export default interface ILanDeviceConstrucotr {
     disabled: boolean;
     encryptedData?: string;
     iv: string;
+    index?: number;
 }
