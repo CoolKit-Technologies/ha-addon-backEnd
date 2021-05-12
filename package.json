@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "dev": "cross-env DEBUG_MODE=true nodemon src/index.ts",
-        "start": "node index.js"
+        "start": "node index.js",
+        "sync": "bash sync.sh"
     },
     "keywords": [],
     "author": "",
