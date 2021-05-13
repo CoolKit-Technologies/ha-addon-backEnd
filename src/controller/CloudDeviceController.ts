@@ -5,6 +5,7 @@ abstract class CloudDeviceController {
     rssi: number;
     apikey: string;
     deviceName: string;
+    devicekey: string;
     deviceId: string;
     index: number;
     online: boolean;
@@ -21,6 +22,7 @@ abstract class CloudDeviceController {
         this.extra = data.extra;
         this.index = data.index;
         this.online = data.online;
+        this.devicekey = data.devicekey;
     }
 }
 

@@ -29,10 +29,11 @@ CkApi.init({
 (async () => {
     initMdns(); // 扫描局域网设备
     // todo
-    // await AuthClass.init();
-    // if (AuthClass.curAuth) {
-    //     eventBus.emit('init-ha-socket');
-    // }
+    // 完善认证逻辑
+    await AuthClass.init();
+    if (AuthClass.curAuth) {
+        eventBus.emit('init-ha-socket');
+    }
     await initHaSocket(); // 跟HA建立socket连接
     await initCkWs(); // 跟易微联Socket建立连接
     await initCkApi(); // 初始化v2接口并保持登录

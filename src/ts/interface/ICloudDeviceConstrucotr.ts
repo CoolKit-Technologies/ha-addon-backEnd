@@ -2,6 +2,7 @@ import { ICloudDeviceParams } from './ICloudDeviceParams';
 
 interface ICloudDeviceConstrucotr<T = ICloudDeviceParams> {
     deviceId: string;
+    devicekey: string;
     deviceName: string;
     apikey: string;
     online: boolean;

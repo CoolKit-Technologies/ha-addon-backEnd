@@ -125,8 +125,8 @@ const auth = async (req: Request, res: Response) => {
         const result = await getAuth(clientId, code);
         if (result && result.status === 200) {
             // todo
-            // AuthClass.setAuth(req.ip, clientId, result.data);
-            // eventBus.emit('init-ha-socket');
+            AuthClass.setAuth(req.ip, clientId, result.data);
+            eventBus.emit('init-ha-socket');
             console.log('Jia ~ file: redirectToAuth.ts ~ line 44 ~ result.data', result.data);
             res.json({
                 error: 0,

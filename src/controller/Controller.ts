@@ -100,10 +100,18 @@ class Controller {
                 return old;
             }
 
-            // 如果设备之前是Cloud设备,需要保持设备的位置不便
+            // 如果设备之前是Cloud设备,需要保持设备的位置不变
             let tmpIndex;
+            let oldDeviceParams = {};
             if (old instanceof CloudDeviceController) {
-                tmpIndex = old.index;
+                oldDeviceParams = {
+                    index: old.index,
+                    devicekey: old.devicekey,
+                    selfApikey: old.apikey,
+                    deviceName: old.deviceName,
+                    extra: old.extra,
+                    params: old.params,
+                };
             }
 
             if (lanType === 'plug') {
@@ -147,6 +155,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     online: tmp.online,
+                    devicekey:tmp.devicekey,
                     disabled,
                     index: _index,
                 });
@@ -163,6 +172,7 @@ class Controller {
                     params: tmp.params,
                     tags: tmp.tags,
                     online: tmp.online,
+                    devicekey: tmp.devicekey,
                     disabled,
                     index: _index,
                 });
@@ -179,6 +189,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     online: tmp.online,
+                    devicekey: tmp.devicekey,
                     disabled,
                     index: _index,
                 });
@@ -211,6 +222,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     online: tmp.online,
+                    devicekey: tmp.devicekey,
                     disabled,
                     index: _index,
                 });
@@ -274,6 +286,7 @@ class Controller {
                     apikey: tmp.apikey,
                     extra: tmp.extra,
                     params: tmp.params,
+                    devicekey: tmp.devicekey,
                     disabled,
                     online: tmp.online,
                     index: _index,

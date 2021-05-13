@@ -39,7 +39,7 @@ const getDevices = async (req: Request, res: Response) => {
         }
 
         if (refresh) {
-            syncDevice2Ha({
+            await syncDevice2Ha({
                 syncLovelace: false,
                 sleepTime: 2000,
             });
@@ -125,7 +125,7 @@ const disableDevice = async (req: Request, res: Response) => {
             removeEntityByDevice(device);
         }
         if (!disabled) {
-            syncDevice2Ha({
+            await syncDevice2Ha({
                 syncLovelace: true,
                 sleepTime: 2000,
             });
@@ -247,6 +247,7 @@ const proxy2ws = async (req: Request, res: Response) => {
             if (device instanceof CloudDeviceController || device instanceof LanDeviceController) {
                 device.params = mergeDeviceParams(device.params, params);
                 device.online = true;
+                eventBus.emit('sse');
             }
             if (device instanceof CloudSwitchController || device instanceof CloudTandHModificationController) {
                 // 同步到HA
@@ -262,7 +263,6 @@ const proxy2ws = async (req: Request, res: Response) => {
                 // 同步到HA
                 device.updateState(device.params.switches);
             }
-            eventBus.emit('sse');
         } else {
             res.json({
                 error,

@@ -15,18 +15,18 @@ const sse = async (req: Request, res: Response) => {
 
     res.write('retry: 10000\n');
 
-    eventBus.on('sse', () => {
+    const handler = () => {
         const result = getFormattedDeviceList();
-
         res.write('data: ' + JSON.stringify(result) + '\n\n');
-    });
+    };
 
-    // let count = 1;
-    // setInterval(() => {
-    //     res.write('id: ' + count + '\n');
-    //     res.write('data: ' + JSON.stringify({ a: 1, b: 2, count: count++ }) + '\n\n');
-    //     console.log('发送消息');
-    // }, 3000);
+    eventBus.addListener('sse', handler);
+
+    res.on('close', () => {
+        eventBus.removeListener('sse', handler);
+        res.end();
+        console.log('clooooooooooooooooooooooooooooooooooooose');
+    });
 };
 
 export default sse;

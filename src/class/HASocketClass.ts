@@ -135,6 +135,7 @@ class HaSocket {
 
             // 设置超时
             setTimeout(() => {
+                this.client.removeEventListener('message', handler);
                 resolve(-1);
             }, 5000);
 

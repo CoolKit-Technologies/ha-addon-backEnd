@@ -129,7 +129,7 @@ export default async (reconnect = false) => {
         if (res === 0) {
             HASocket.subscribeEvents('call_service');
             HASocket.handleEvent('call_service', async (res: TypeHaSocketCallServiceData) => {
-                console.log('HA触发call_service事件', res);
+                console.log('HA emit call_service event', res);
 
                 const {
                     service_data: { entity_id },
