@@ -9,6 +9,7 @@ import { getDataSync } from './dataUtil';
 import CloudTandHModificationController from '../controller/CloudTandHModificationController';
 import CloudPowerDetectionSwitchController from '../controller/CloudPowerDetectionSwitchController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
 
 const ghostManufacturer = (manufacturer: string = 'eWeLink') => {
     if (~manufacturer.indexOf('松诺') || ~manufacturer.toLocaleUpperCase().indexOf('SONOFF')) {
@@ -23,6 +24,7 @@ const formatDevice = (data: DiyController | CloudDeviceController | LanDeviceCon
             key: data.deviceId,
             uiid: data.uiid,
             deviceId: data.deviceId,
+            deviceName: data.deviceName,
             disabled: data.disabled,
             ip: data.ip,
             port: data.port,
@@ -62,7 +64,7 @@ const formatDevice = (data: DiyController | CloudDeviceController | LanDeviceCon
         if (data instanceof CloudMultiChannelSwitchController) {
             tags = data.channelName;
         }
-        if (data instanceof CloudTandHModificationController) {
+        if (data instanceof CloudTandHModificationController || data instanceof LanTandHModificationController) {
             unit = data.unit;
         }
         if (data instanceof CloudPowerDetectionSwitchController || data instanceof CloudDualR3Controller) {
@@ -97,14 +99,25 @@ const getFormattedDeviceList = () => {
     for (let item of Controller.unsupportDeviceMap.values()) {
         result.push(item);
     }
-    const oldDiyDevices = getDataSync('diy.json', []) as { [key: string]: boolean };
+    const oldDiyDevices = getDataSync('diy.json', []) as { [key: string]: any };
     for (let key in oldDiyDevices) {
-        if (!Controller.getDevice(key)) {
-            result.push({
-                online: false,
-                type: 1,
-                deviceId: key,
-            });
+        try {
+            if (!Controller.getDevice(key)) {
+                result.push({
+                    online: false,
+                    type: 1,
+                    deviceId: key,
+                    deviceName: _.get(oldDiyDevices, [key, 'deviceName']),
+                });
+            }
+        } catch (error) {
+            if (!Controller.getDevice(key)) {
+                result.push({
+                    online: false,
+                    type: 1,
+                    deviceId: key,
+                });
+            }
         }
     }
     result.sort((a, b) => {

@@ -10,6 +10,7 @@ import DiyController from '../controller/DiyDeviceController';
 import LanDualR3Controller from '../controller/LanDualR3Controller';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
 import LanSwitchController from '../controller/LanSwitchController';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
 type TypeCard = {
     type: string;
     entities: string[];
@@ -68,7 +69,7 @@ const generateLovelace = async () => {
                 device instanceof LanDualR3Controller
             ) {
                 if (device instanceof LanDualR3Controller) {
-                    console.log("Jia ~ file: generateLovelace.ts ~ line 71 ~ generateLovelace ~ device", device);
+                    console.log('Jia ~ file: generateLovelace.ts ~ line 71 ~ generateLovelace ~ device', device);
                 }
                 if (device.maxChannel === 1 && device.deviceName) {
                     singalSwitchCard.entities.push(`${device.entityId}_1`);
@@ -94,7 +95,10 @@ const generateLovelace = async () => {
                     lovelace.cards.push(tmpCard);
                 }
             }
-            if (device instanceof CloudTandHModificationController) {
+            if (device instanceof CloudTandHModificationController || device instanceof LanTandHModificationController) {
+                if (!device.deviceName) {
+                    continue;
+                }
                 const tmpCard = {
                     type: 'entities',
                     entities: [`switch.${device.deviceId}`, `sensor.${device.deviceId}_t`, `sensor.${device.deviceId}_h`],

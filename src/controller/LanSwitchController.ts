@@ -9,7 +9,7 @@ import LanDeviceController from './LanDeviceController';
 class LanSwitchController extends LanDeviceController {
     entityId: string;
     params?: ICloudSwitchParams;
-    setSwitch!: (status: string) => Promise<void>;
+    setSwitch!: (status: string) => Promise<0 | -1>;
     updateState!: (status: string) => Promise<any>;
     constructor(props: ILanDeviceConstrucotr) {
         super(props);
@@ -34,8 +34,10 @@ LanSwitchController.prototype.setSwitch = async function (status) {
         if (res?.data && res.data.error === 0) {
             this.updateState(status);
             this.params!.switch = status;
+            return 0;
         }
     }
+    return -1;
 };
 
 LanSwitchController.prototype.updateState = async function (status) {

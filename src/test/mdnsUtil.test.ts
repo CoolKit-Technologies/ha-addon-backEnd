@@ -25,11 +25,6 @@ mdns.on('response', function (response: any) {
     }
 });
 
-// mdns.on('query', function (query: any) {
-//     console.log('got a query packet:', query.questions[0]);
-// });
-
-// // lets query for an A record for 'brunhilde.local'
 mdns.query(
     {
         questions: [
@@ -44,18 +39,3 @@ mdns.query(
     }
 );
 
-// mdns.respond(
-//     {
-//         answers: [
-//             {
-//                 name: 'brunhilde.local',
-//                 type: 'PTR',
-//                 ttl: 1,
-//                 data: '123',
-//             },
-//         ],
-//     },
-//     () => {
-//         console.log('456');
-//     }
-// );

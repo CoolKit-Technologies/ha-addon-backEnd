@@ -33,6 +33,7 @@ import UnsupportDeviceController from './UnsupportDeviceController';
 import CloudDualR3Controller from './CloudDualR3Controller';
 import { device } from 'coolkit-open-api/dist/api';
 import LanDualR3Controller from './LanDualR3Controller';
+import LanTandHModificationController from './LanTandHModificationController';
 
 class Controller {
     static deviceMap: Map<string, DiyDeviceController | CloudDeviceController | LanDeviceController> = new Map();
@@ -143,6 +144,15 @@ class Controller {
                 Controller.deviceMap.set(id, lanDevice);
                 return lanDevice;
             }
+            if (lanType === 'th_plug') {
+                const lanDevice = new LanTandHModificationController({
+                    ...params,
+                    disabled,
+                    index: tmpIndex,
+                });
+                Controller.deviceMap.set(id, lanDevice);
+                return lanDevice;
+            }
         }
         // CLOUD
         if (type === 4) {
@@ -155,7 +165,7 @@ class Controller {
                     extra: tmp.extra,
                     params: tmp.params,
                     online: tmp.online,
-                    devicekey:tmp.devicekey,
+                    devicekey: tmp.devicekey,
                     disabled,
                     index: _index,
                 });

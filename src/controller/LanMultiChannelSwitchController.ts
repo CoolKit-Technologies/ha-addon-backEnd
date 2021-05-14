@@ -1,4 +1,4 @@
-import axios from 'axios';
+import _ from 'lodash';
 import { setSwitches } from '../apis/lanDeviceApi';
 import { updateStates } from '../apis/restApi';
 import { ICloudMultiChannelSwitchParams } from '../ts/interface/ICloudDeviceParams';
@@ -17,7 +17,7 @@ class LanMultiChannelSwitchController extends LanDeviceController {
     params?: ICloudMultiChannelSwitchParams;
     maxChannel?: number;
     channelName?: { [key: string]: string };
-    setSwitch!: (switches: TypeSwitch[]) => Promise<void>;
+    setSwitch!: (switches: TypeSwitch[]) => Promise<0 | -1>;
     updateState!: (switches: TypeSwitches) => Promise<any>;
     constructor(props: ILanDeviceConstrucotr) {
         const { deviceId } = props;
@@ -39,11 +39,13 @@ LanMultiChannelSwitchController.prototype.setSwitch = async function (switches) 
                 switches,
             }),
         });
-        if (res && res.data && res.data.error === 0) {
+        if (_.get(res, ['data', 'error']) === 0) {
             this.updateState(switches);
             this.params = mergeDeviceParams(this.params, { switches });
+            return 0;
         }
     }
+    return -1;
 };
 
 LanMultiChannelSwitchController.prototype.updateState = async function (switches) {

@@ -30,7 +30,7 @@ export default () => {
                 const diyDevice = formatDiyDevice(device as TypeDiyDevice);
                 device.updateState(diyDevice.data?.switch!);
                 // 表示该diy设备在线
-                appendData('diy.json', [diyDevice.id], true);
+                appendData('diy.json', [diyDevice.id, 'online'], true);
             }
             if (device instanceof LanSwitchController) {
                 const decryptData = device.parseEncryptedData();

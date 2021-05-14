@@ -16,7 +16,7 @@ class LanDualR3Controller extends LanDeviceController {
     entityId: string;
     maxChannel: number = 2;
     channelName?: { [key: string]: string };
-    setSwitch!: (switches: TypeSwitch[]) => Promise<void>;
+    setSwitch!: (switches: TypeSwitch[]) => Promise<0 | -1>;
     updateState!: (switches: TypeSwitches) => Promise<any>;
     constructor(props: ILanDeviceConstrucotr) {
         super(props);
@@ -41,8 +41,10 @@ LanDualR3Controller.prototype.setSwitch = async function (switches) {
         if (res && res.data && res.data.error === 0) {
             this.updateState(switches);
             this.params = mergeDeviceParams(this.params, { switches });
+            return 0;
         }
     }
+    return -1;
 };
 
 LanDualR3Controller.prototype.updateState = async function (switches) {

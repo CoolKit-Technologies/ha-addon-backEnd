@@ -12,8 +12,8 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
     params: ICloudPowerDetectionSwitchParams;
     updateSwitch!: (status: string) => Promise<void>;
     updateState!: (params: { status: string; power?: string; current?: string; voltage?: string }) => Promise<void>;
-    current: string;
-    voltage: string;
+    current?: string;
+    voltage?: string;
     power: string;
     state: string;
     rate?: number;
@@ -23,13 +23,16 @@ class CloudPowerDetectionSwitchController extends CloudDeviceController {
         this.params = params.params;
         this.disabled = params.disabled!;
         this.state = params.params.switch;
-        this.current = params.params.current;
-        this.voltage = params.params.voltage;
+
         this.uiid = params.extra.uiid;
         this.power = params.params.power;
         this.online = params.online;
         this.rate = +getDataSync('rate.json', [this.deviceId]) || 0;
 
+        if (this.uiid === 32) {
+            this.current = params.params.current;
+            this.voltage = params.params.voltage;
+        }
         // // 如果电流电压功率有更新就通知我
         // setInterval(() => {
         //     coolKitWs.updateThing({
@@ -67,20 +70,28 @@ CloudPowerDetectionSwitchController.prototype.updateState = async function ({ po
     if (!this.online) {
         state = 'unavailable';
     }
+    let attributes: any = {
+        restored: true,
+        supported_features: 0,
+        friendly_name: this.deviceName,
+        power: `${power || this.power || 0} W`,
+        state: state || this.state,
+    };
+
+    if (this.uiid === 32) {
+        attributes = {
+            ...attributes,
+            current: `${current || this.current || 0} A`,
+            voltage: `${voltage || this.voltage || 0} V`,
+        };
+    }
 
     const res = await updateStates(this.entityId, {
         entity_id: this.entityId,
         state: state || this.state,
-        attributes: {
-            restored: true,
-            supported_features: 0,
-            friendly_name: this.deviceName,
-            power: `${power || this.power || 0} W`,
-            current: `${current || this.current || 0} A`,
-            voltage: `${voltage || this.voltage || 0} V`,
-            state: state || this.state,
-        },
+        attributes,
     });
+
     state && (this.state = state);
     power && (this.power = power);
     current && (this.current = current);

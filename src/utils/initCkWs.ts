@@ -97,9 +97,7 @@ export default async () => {
                         }
                     }
 
-                    // 同步状态到前端
                     eventBus.emit('update-controller', data);
-                    eventBus.emit('sse');
                 }
 
                 if (tmp.action === 'sysmsg' && device?.entityId) {
@@ -117,11 +115,12 @@ export default async () => {
                                 },
                             });
                         }
-                        // 同步状态到前端
                         eventBus.emit('device-offline', device.deviceId);
-                        eventBus.emit('sse');
                     }
                 }
+
+                // 同步状态到前端
+                eventBus.emit('sse');
             }
         } catch (error) {
             console.log(error);

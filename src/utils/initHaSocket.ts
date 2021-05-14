@@ -16,6 +16,7 @@ import CloudDoubleColorLightController from '../controller/CloudDoubleColorLight
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import eventBus from './eventBus';
 import LanDualR3Controller from '../controller/LanDualR3Controller';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
 
 /**
  * @param {string} entity_id 实体id
@@ -49,6 +50,10 @@ const handleDeviceByEntityId = async (entity_id: string, state: string, res: any
                 },
             ]);
         }
+    }
+    // lan 恒温恒湿
+    if (device instanceof LanTandHModificationController) {
+        device.setSwitch(state);
     }
 
     // Cloud

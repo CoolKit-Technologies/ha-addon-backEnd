@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { updateStates } from '../apis/restApi';
 import TypeDiyDevice from '../ts/type/TypeMdnsDiyDevice';
+import { getDataSync } from '../utils/dataUtil';
 type TypeConstrucotr = {
     deviceId: string;
     ip: string;
@@ -11,6 +12,7 @@ type TypeConstrucotr = {
 
 class DiyController {
     deviceId: string;
+    deviceName: string;
     entityId: string;
     ip: string;
     port: number;
@@ -28,6 +30,7 @@ class DiyController {
         // this.entityId = `switch.${deviceId}`;
         this.disabled = disabled;
         this.txt = txt;
+        this.deviceName = getDataSync('diy.json', [deviceId, 'deviceName']) || `DIY-${deviceId}`;
     }
 }
 

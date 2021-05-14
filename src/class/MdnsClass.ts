@@ -95,7 +95,7 @@ export default class Mdns {
                     return;
                 }
                 if (tmp.txt?.type === 'diy_plug') {
-                    console.log('发现diy设备');
+                    console.log('Found Diy Switch ');
                     const diyDevice = Controller.setDevice({
                         id: key,
                         data: tmp as TypeDiyDevice,
@@ -104,6 +104,7 @@ export default class Mdns {
                     callback && callback(diyDevice);
                 }
                 if (tmp.txt?.type === 'plug') {
+                    console.log('Found Lan Switch');
                     const lanDevice = Controller.setDevice({
                         id: key,
                         data: tmp as TypeLanDevice,
@@ -113,6 +114,7 @@ export default class Mdns {
                     callback && callback(lanDevice);
                 }
                 if (tmp.txt?.type === 'strip') {
+                    console.log('Found Lan Multi-Switch');
                     const lanDevice = Controller.setDevice({
                         id: key,
                         data: tmp as TypeLanDevice,
@@ -122,17 +124,28 @@ export default class Mdns {
                     callback && callback(lanDevice);
                 }
                 if (tmp.txt?.type === 'multifun_switch') {
+                    console.log('Found Lan DualR3');
                     const dualR3 = Controller.setDevice({
                         id: key,
                         data: tmp as TypeLanDevice,
                         type: 2,
                         lanType: 'multifun_switch',
                     });
-                    console.log('发现局域网的DualR3');
                     callback && callback(dualR3);
                 }
                 if (tmp.txt?.type === 'enhanced_plug') {
+                    console.log('Found Lan 单通道插座增强版（用电统计）');
                     // todo
+                }
+                if (tmp.txt?.type === 'th_plug') {
+                    console.log('Found Lan 单通道温湿度控制器');
+                    const device = Controller.setDevice({
+                        id: key,
+                        data: tmp as TypeLanDevice,
+                        type: 2,
+                        lanType: 'th_plug',
+                    });
+                    callback && callback(device);
                 }
             }
         });

@@ -16,6 +16,7 @@ import LanSwitchController from '../controller/LanSwitchController';
 import CloudDualR3Controller from '../controller/CloudDualR3Controller';
 import { getDataSync } from './dataUtil';
 import LanDualR3Controller from '../controller/LanDualR3Controller';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
 
 // 获取设备并同步到HA
 export default async () => {
@@ -79,7 +80,7 @@ export default async () => {
                 if (device instanceof CloudSwitchController) {
                     !device.disabled && device.updateState(params.switch);
                 }
-                if (device instanceof CloudTandHModificationController) {
+                if (device instanceof CloudTandHModificationController || device instanceof LanTandHModificationController) {
                     !device.disabled && device.updateState(params.switch);
                     !device.disabled && device.updateTandH(params.currentTemperature, params.currentHumidity);
                 }

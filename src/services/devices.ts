@@ -24,6 +24,10 @@ import mergeDeviceParams from '../utils/mergeDeviceParams';
 import CloudSwitchController from '../controller/CloudSwitchController';
 import syncDevice2Ha from '../utils/syncDevice2Ha';
 import removeEntityByDevice from '../utils/removeEntityByDevice';
+import LanSwitchController from '../controller/LanSwitchController';
+import LanDualR3Controller from '../controller/LanDualR3Controller';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
+import updateDiyDeviceName from '../utils/updateDiyDeviceName';
 
 const mdns = initMdns();
 
@@ -332,7 +336,6 @@ const upgradeDevice = async (req: Request, res: Response) => {
 
 const updateDiyDevice = async (req: Request, res: Response) => {
     const { type, id, params } = req.body;
-
     try {
         const device = Controller.getDevice(id);
         if (device instanceof DiyController) {
@@ -356,6 +359,9 @@ const updateDiyDevice = async (req: Request, res: Response) => {
             if (type === 'sledOnline') {
                 result = await updateDiySledOnlineAPI(reqParams);
             }
+            if (type === 'deviceName') {
+                result = await updateDiyDeviceName(id, params);
+            }
             console.log('Jia ~ file: devices.ts ~ line 381 ~ updateDiyDevice ~ result', result);
             if (result && result.error === 0) {
                 res.json({
@@ -368,6 +374,55 @@ const updateDiyDevice = async (req: Request, res: Response) => {
                     data: null,
                 });
             }
+        }
+    } catch (err) {
+        res.json({
+            error: 500,
+            data: null,
+        });
+        // Controller.deviceMap.delete(id);
+        eventBus.emit('sse');
+    }
+};
+
+/**
+ *
+ * @description 仅开关局域网设备
+ */
+const updateLanDevice = async (req: Request, res: Response) => {
+    const { id, params } = req.body;
+
+    try {
+        const device = Controller.getDevice(id);
+        if (device instanceof LanDeviceController) {
+            let result;
+            if (device instanceof LanSwitchController) {
+                result = await device.setSwitch(params.switch);
+            }
+            if (device instanceof LanMultiChannelSwitchController || device instanceof LanDualR3Controller) {
+                result = await device.setSwitch(params.switches);
+            }
+            if (device instanceof LanTandHModificationController) {
+                result = await device.setSwitch(params.switch);
+            }
+
+            if (result === 0) {
+                res.json({
+                    error: 0,
+                    data: null,
+                });
+            } else {
+                res.json({
+                    error: 500,
+                    data: null,
+                });
+            }
+        } else {
+            res.json({
+                error: 402,
+                msg: 'not such device',
+                data: null,
+            });
         }
     } catch (err) {
         res.json({
@@ -408,7 +463,7 @@ const changeUnit = async (req: Request, res: Response) => {
     try {
         const { id, unit } = req.body;
         const device = Controller.getDevice(id);
-        if (device instanceof CloudTandHModificationController) {
+        if (device instanceof CloudTandHModificationController || device instanceof LanTandHModificationController) {
             const code = await changeDeviceUnit(id, unit);
             if (code === 0) {
                 res.json({
@@ -486,4 +541,5 @@ export {
     removeDiyDevice,
     changeUnit,
     setRate,
+    updateLanDevice,
 };

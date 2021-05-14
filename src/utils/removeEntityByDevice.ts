@@ -7,12 +7,13 @@ import DiyController from '../controller/DiyDeviceController';
 import LanDeviceController from '../controller/LanDeviceController';
 import LanDualR3Controller from '../controller/LanDualR3Controller';
 import LanMultiChannelSwitchController from '../controller/LanMultiChannelSwitchController';
+import LanTandHModificationController from '../controller/LanTandHModificationController';
 
 export default (device: LanDeviceController | DiyController | CloudDeviceController) => {
     if (device instanceof DiyController) {
         return;
     }
-    if (device instanceof CloudTandHModificationController) {
+    if (device instanceof CloudTandHModificationController || device instanceof LanTandHModificationController) {
         removeStates(device.entityId);
         removeStates(`sensor.${device.deviceId}_h`);
         removeStates(`sensor.${device.deviceId}_t`);
