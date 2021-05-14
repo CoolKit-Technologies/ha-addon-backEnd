@@ -1,0 +1,38 @@
+{
+    "name": "cc.coolkit.ha.addon.server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "cross-env DEBUG_MODE=true nodemon src/index.ts",
+        "start": "node index.js",
+        "sync": "bash sync.sh"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "color-convert": "^2.0.1",
+        "coolkit-open-api": "^0.3.4",
+        "coolkit-ws": "^1.5.5",
+        "cors": "^2.8.5",
+        "crypto-js": "^4.0.0",
+        "eventemitter3": "^4.0.7",
+        "express": "^4.17.1",
+        "lodash": "^4.17.21",
+        "mqtt": "^4.2.6",
+        "multicast-dns": "^7.2.2",
+        "socket.io": "^4.0.1"
+    },
+    "devDependencies": {
+        "@types/color-convert": "^2.0.0",
+        "@types/cors": "^2.8.10",
+        "@types/crypto-js": "^4.0.1",
+        "@types/express": "^4.17.11",
+        "@types/lodash": "^4.14.168",
+        "@types/node": "^14.14.35",
+        "@types/socket.io": "^2.1.13",
+        "@types/ws": "^7.4.0",
+        "cross-env": "^7.0.3"
+    }
+}
