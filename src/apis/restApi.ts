@@ -56,7 +56,7 @@ const registerService = async (domain: string, service: string) => {
             service,
         },
     }).catch((e) => {
-        console.log('注册服务', domain, ':', service, '出错');
+        console.log('registerService error: ', domain, ':', service);
     });
 };
 
@@ -81,7 +81,7 @@ const refreshAuth = async (clientId: string, refreshToken: string) => {
         data: `grant_type=refresh_token&client_id=${clientId}&refresh_token=${refreshToken}`,
     });
     res.catch((e) => {
-        console.log('刷新Auth出错:', clientId, '\n', e);
+        console.log('refresh Auth error:', clientId, '\n', e);
     });
     return await res;
 };

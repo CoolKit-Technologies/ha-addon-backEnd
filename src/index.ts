@@ -24,21 +24,22 @@ import eventBus from './utils/eventBus';
 CkApi.init({
     appId,
     appSecret,
+    debug:true
 });
 
 (async () => {
     initMdns(); // 扫描局域网设备
     // todo
     // 完善认证逻辑
-    await AuthClass.init();
+    const res = await AuthClass.init();
     if (AuthClass.curAuth) {
         eventBus.emit('init-ha-socket');
     }
-    await initHaSocket(); // 跟HA建立socket连接
-    await initCkWs(); // 跟易微联Socket建立连接
+    // await initHaSocket(); // 跟HA建立socket连接
     await initCkApi(); // 初始化v2接口并保持登录
-    await sleep(3000);
-    generateLovelace();
+    await initCkWs(); // 跟易微联Socket建立连接
+    // await sleep(3000);
+    // generateLovelace();
     // serviceRegistered(); // 注册HA相关服务
 })();
 
@@ -55,7 +56,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(`${apiPrefix}/user`, userRouter);
 
-// app.use(redirectToAuth);
+app.use(redirectToAuth);
 app.use('/', express.static(path.join(__dirname, '/pages')));
 
 app.use(`${apiPrefix}/devices`, devicesRouter);

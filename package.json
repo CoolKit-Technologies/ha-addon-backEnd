@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "cross-env DEBUG_MODE=true nodemon src/index.ts",
         "start": "node index.js",
+        "build": "rm -rf dist",
         "sync": "bash sync.sh"
     },
     "keywords": [],

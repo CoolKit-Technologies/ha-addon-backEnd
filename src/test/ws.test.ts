@@ -14,5 +14,5 @@ import { getDataSync } from '../utils/dataUtil';
         apikey,
     });
 
-    console.log('连接的结果: ', result);
+    console.log('connect result: ', result);
 })();

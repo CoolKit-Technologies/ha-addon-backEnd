@@ -36,8 +36,8 @@ export default async () => {
     coolKitWs.on('message', async (ws) => {
         try {
             const { type, data } = ws;
-            console.log('接受到CKWS消息:type-->', data);
-            console.log('接受到CKWS消息:\n', data);
+            console.log('receive CKWS msg:type-->', data);
+            console.log('receive CKWS msg:\n', data);
             if (type === 'message' && data !== 'pong') {
                 const tmp = JSON.parse(data);
                 if (!tmp.deviceid) {

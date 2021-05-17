@@ -27,7 +27,7 @@ eventBus.on('device-offline', (id) => {
 });
 
 eventBus.on('init-ha-socket', async () => {
-    await initHaSocket(); // 跟HA建立socket连接
+    await initHaSocket(true); // 跟HA建立socket连接
 });
 
 export default eventBus;

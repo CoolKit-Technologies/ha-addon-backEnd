@@ -124,7 +124,6 @@ const auth = async (req: Request, res: Response) => {
         const { code, clientId } = req.body;
         const result = await getAuth(clientId, code);
         if (result && result.status === 200) {
-            // todo
             AuthClass.setAuth(req.ip, clientId, result.data);
             eventBus.emit('init-ha-socket');
             console.log('Jia ~ file: redirectToAuth.ts ~ line 44 ~ result.data', result.data);
@@ -147,4 +146,22 @@ const auth = async (req: Request, res: Response) => {
     }
 };
 
-export { login, logout, isLogin, auth };
+const isAuth = async (req: Request, res: Response) => {
+    try {
+        const status = AuthClass.isValid(req.ip);
+        res.json({
+            error: 0,
+            data: {
+                isAuth: status,
+            },
+        });
+    } catch (err) {
+        console.log(err);
+        res.json({
+            error: 500,
+            data: err,
+        });
+    }
+};
+
+export { login, logout, isLogin, auth, isAuth };
