@@ -2,7 +2,6 @@ import WebSocket from 'ws';
 import { HaToken } from '../config/auth';
 import { HaSocketURL } from '../config/url';
 import TypeHaSocketMsg from '../ts/type/TypeHaSocketMsg';
-import getThings from '../utils/getThings';
 import AuthClass from './AuthClass';
 import initHaSocket from '../utils/initHaSocket';
 import syncDevice2Ha from '../utils/syncDevice2Ha';
@@ -23,7 +22,7 @@ class HaSocket {
                 console.log('请检查HA是否正确运行');
             });
         } catch (error) {
-            console.log('初始化HA-WS连接出错', error);
+            console.log('init HA-WS error', error);
         }
     }
 
@@ -48,7 +47,9 @@ class HaSocket {
                 this.client.send(
                     JSON.stringify({
                         type: 'auth',
-                        access_token: HaToken,
+                        // todo
+                        // access_token: HaToken,
+                        access_token: AuthClass.curAuth,
                     })
                 );
             });

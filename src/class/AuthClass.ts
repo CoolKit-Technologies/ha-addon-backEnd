@@ -23,6 +23,7 @@ class AuthClass {
             for (let origin in auths) {
                 const auth = JSON.parse(auths[origin]) as TypeToken;
                 if (auth && Date.now() < +auth.expires_time) {
+                    AuthClass.AuthMap.set(origin, auth);
                     const tmp = await this.refresh(origin);
                     if (tmp) {
                         this.curAuth = auth.access_token;
@@ -34,8 +35,10 @@ class AuthClass {
         }
     }
 
-    isValid(origin: string) {
-        const auth = AuthClass.AuthMap.get(origin);
+    isValid(host: string) {
+        const auth = AuthClass.AuthMap.get(host);
+        console.log('=====', AuthClass.AuthMap);
+
         if (auth && auth.expires_time > Date.now()) {
             this.curAuth = auth.access_token;
             return true;

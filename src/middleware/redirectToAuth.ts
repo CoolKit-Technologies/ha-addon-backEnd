@@ -32,15 +32,15 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     if (AuthClass.isValid(ip)) {
         next();
     } else {
-        if (url === '/' || url.indexOf('/?code') === 0) {
-            next();
-        } else {
-            console.log('Jia ~ file: redirectToAuth.ts ~ line 40 ~ url', url);
+        // if (url === '/' || url.indexOf('/?code') === 0) {
+        //     next();
+        // } else {
+        //     console.log('Jia ~ file: redirectToAuth.ts ~ line 40 ~ url', url);
             res.json({
                 error: 302,
                 data: HaRestURL,
             });
-        }
+        // }
     }
     // } else {
     //     next();

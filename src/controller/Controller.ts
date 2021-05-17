@@ -91,7 +91,7 @@ class Controller {
             const params = formatLanDevice(data as TypeLanDevice);
             // 如果ip不存在说明该设备可能不支持局域网
             if (!params || (!params.ip && !params.target)) {
-                console.log('该设备不支持局域网', params?.deviceId);
+                console.log('the device is not lan support', params?.deviceId);
                 return;
             }
             const old = Controller.getDevice(id);
